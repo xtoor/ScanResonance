@@ -1,5 +1,20 @@
 import { Card } from "@/components/ui/card";
 import type { BreakoutConfiguration } from "@shared/schema";
+import { useState, useEffect } from "react";
+import { usePriceData } from "@/lib/priceService";
+import { scannerService, type BreakoutResult } from "@/lib/scannerService";
+
+interface CandleData {
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+  time: string;
+  isBreakout?: boolean;
+  isPotential?: boolean;
+  breakoutType?: 'confirmed' | 'potential';
+}
 
 interface ChartContainerProps {
   selectedSymbol: string;
@@ -12,6 +27,76 @@ export default function ChartContainer({
   timeframe, 
   configuration 
 }: ChartContainerProps) {
+  const [candleData, setCandleData] = useState<CandleData[]>([]);
+  const [breakoutSignals, setBreakoutSignals] = useState<BreakoutResult[]>([]);
+  const { priceData } = usePriceData(selectedSymbol);
+
+  // Generate realistic candle data
+  useEffect(() => {
+    if (!priceData) return;
+    
+    const generateCandleData = () => {
+      const candles: CandleData[] = [];
+      const basePrice = priceData.price;
+      const now = new Date();
+      
+      // Generate 20 candles with realistic price movements
+      for (let i = 19; i >= 0; i--) {
+        const time = new Date(now.getTime() - i * 5 * 60 * 1000); // 5-minute intervals
+        const volatility = 0.02; // 2% volatility
+        const priceChange = (Math.random() - 0.5) * volatility;
+        
+        const open = basePrice * (1 + priceChange);
+        const close = open * (1 + (Math.random() - 0.5) * volatility);
+        const high = Math.max(open, close) * (1 + Math.random() * volatility * 0.5);
+        const low = Math.min(open, close) * (1 - Math.random() * volatility * 0.5);
+        
+        candles.push({
+          open,
+          high,
+          low,
+          close,
+          volume: Math.random() * 1000000 + 100000,
+          time: time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        });
+      }
+      
+      setCandleData(candles);
+    };
+    
+    generateCandleData();
+    const interval = setInterval(generateCandleData, 30000); // Update every 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [priceData, selectedSymbol]);
+
+  // Listen for breakout signals
+  useEffect(() => {
+    const unsubscribe = scannerService.onBreakoutDetected((result: BreakoutResult) => {
+      if (result.symbol === selectedSymbol) {
+        setBreakoutSignals(prev => [...prev.slice(-4), result]); // Keep last 5 signals
+      }
+    });
+    
+    return unsubscribe;
+  }, [selectedSymbol]);
+
+  // Calculate price range for chart scaling
+  const priceRange = candleData.length > 0 ? {
+    min: Math.min(...candleData.map(c => c.low)),
+    max: Math.max(...candleData.map(c => c.high))
+  } : { min: 0, max: 100 };
+  
+  const priceSpread = priceRange.max - priceRange.min;
+  
+  const getCandleHeight = (candle: CandleData) => {
+    const bodyHeight = Math.abs(candle.close - candle.open) / priceSpread * 200;
+    return Math.max(bodyHeight, 2); // Minimum 2px height
+  };
+  
+  const getCandlePosition = (candle: CandleData) => {
+    return ((priceRange.max - Math.max(candle.open, candle.close)) / priceSpread) * 200;
+  };
   return (
     <div className="flex-1 relative bg-trading-darker">
       <div className="absolute inset-0 p-6">
@@ -28,69 +113,114 @@ export default function ChartContainer({
 
           {/* Price Chart Area */}
           <div className="absolute inset-6">
-            {/* Mock Candlestick Chart */}
-            <div className="flex items-end justify-between h-4/5 space-x-1" data-testid="chart-candlesticks">
-              {/* Candlestick bars */}
-              <div className="bg-bullish w-2 h-16 rounded-sm opacity-80"></div>
-              <div className="bg-bearish w-2 h-12 rounded-sm opacity-80"></div>
-              <div className="bg-bullish w-2 h-20 rounded-sm opacity-80"></div>
-              <div className="bg-bullish w-2 h-18 rounded-sm opacity-80"></div>
-              <div className="bg-bearish w-2 h-8 rounded-sm opacity-80"></div>
-              <div className="bg-bullish w-2 h-24 rounded-sm opacity-80"></div>
-              <div className="bg-bullish w-2 h-28 rounded-sm opacity-80"></div>
-              <div className="bg-bullish w-2 h-32 rounded-sm opacity-80 relative">
-                {/* Breakout Signal */}
-                <div 
-                  className="absolute -top-8 -left-4 px-2 py-1 rounded text-xs font-mono whitespace-nowrap text-white"
-                  style={{ backgroundColor: configuration.breakoutColor || "#00C853" }}
-                  data-testid="breakout-signal"
-                >
-                  🚨 BREAKOUT
-                </div>
-                <div 
-                  className="absolute top-0 left-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent transform -translate-x-1/2 -translate-y-1"
-                  style={{ borderBottomColor: configuration.breakoutColor || "#00C853" }}
-                ></div>
+            {/* Dynamic Candlestick Chart */}
+            <div className="relative h-4/5" data-testid="chart-candlesticks">
+              <div className="flex items-end justify-between h-full space-x-1">
+                {candleData.map((candle, index) => {
+                  const isBullish = candle.close > candle.open;
+                  const hasBreakout = breakoutSignals.some(signal => 
+                    Math.abs(new Date(signal.timestamp).getTime() - new Date().getTime()) < 300000 // 5 minutes
+                  );
+                  const isPotential = Math.random() > 0.7; // 30% chance for demo
+                  
+                  return (
+                    <div 
+                      key={index}
+                      className={`relative w-2 rounded-sm opacity-80 transition-all duration-300 ${
+                        isBullish ? 'bg-bullish' : 'bg-bearish'
+                      }`}
+                      style={{ height: `${getCandleHeight(candle)}px` }}
+                    >
+                      {/* Confirmed Breakout Signal */}
+                      {hasBreakout && index >= candleData.length - 3 && (
+                        <>
+                          <div 
+                            className="absolute -top-8 -left-6 px-2 py-1 rounded text-xs font-mono whitespace-nowrap text-white animate-pulse"
+                            style={{ backgroundColor: configuration.breakoutColor || "#00C853" }}
+                            data-testid="breakout-signal"
+                          >
+                            🚨 BREAKOUT
+                          </div>
+                          <div 
+                            className="absolute top-0 left-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent transform -translate-x-1/2 -translate-y-1"
+                            style={{ borderBottomColor: configuration.breakoutColor || "#00C853" }}
+                          ></div>
+                        </>
+                      )}
+                      
+                      {/* Potential Breakout Signal */}
+                      {isPotential && !hasBreakout && index >= candleData.length - 5 && (
+                        <>
+                          <div 
+                            className="absolute -top-8 -left-6 px-2 py-1 rounded text-xs font-mono whitespace-nowrap text-white"
+                            style={{ backgroundColor: configuration.potentialColor || "#FF9800" }}
+                            data-testid="potential-signal"
+                          >
+                            ⚠ POTENTIAL
+                          </div>
+                          <div 
+                            className="absolute top-0 left-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent transform -translate-x-1/2 -translate-y-1"
+                            style={{ borderBottomColor: configuration.potentialColor || "#FF9800" }}
+                          ></div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-              <div className="bg-bullish w-2 h-26 rounded-sm opacity-80"></div>
-              <div className="bg-bearish w-2 h-14 rounded-sm opacity-80"></div>
-              <div className="bg-bullish w-2 h-22 rounded-sm opacity-80"></div>
             </div>
 
-            {/* Volume Histogram */}
+            {/* Dynamic Volume Histogram */}
             {configuration.showVolumeHistogram && (
               <div className="flex items-end justify-between h-1/5 space-x-1 mt-4" data-testid="volume-histogram">
-                <div className="bg-bullish w-2 h-6 rounded-sm opacity-40"></div>
-                <div className="bg-bearish w-2 h-4 rounded-sm opacity-40"></div>
-                <div className="bg-bullish w-2 h-8 rounded-sm opacity-40"></div>
-                <div className="bg-bullish w-2 h-7 rounded-sm opacity-40"></div>
-                <div className="bg-bearish w-2 h-3 rounded-sm opacity-40"></div>
-                <div className="bg-bullish w-2 h-10 rounded-sm opacity-40"></div>
-                <div className="bg-bullish w-2 h-12 rounded-sm opacity-40"></div>
-                <div className="bg-bullish w-2 h-16 rounded-sm opacity-60"></div>
-                <div className="bg-bullish w-2 h-11 rounded-sm opacity-40"></div>
-                <div className="bg-bearish w-2 h-5 rounded-sm opacity-40"></div>
-                <div className="bg-bullish w-2 h-9 rounded-sm opacity-40"></div>
+                {candleData.map((candle, index) => {
+                  const isBullish = candle.close > candle.open;
+                  const maxVolume = Math.max(...candleData.map(c => c.volume));
+                  const volumeHeight = (candle.volume / maxVolume) * 60; // Scale to max 60px
+                  
+                  return (
+                    <div 
+                      key={index}
+                      className={`w-2 rounded-sm opacity-40 ${
+                        isBullish ? 'bg-bullish' : 'bg-bearish'
+                      }`}
+                      style={{ height: `${Math.max(volumeHeight, 2)}px` }}
+                    ></div>
+                  );
+                })}
               </div>
             )}
 
-            {/* Price Labels */}
+            {/* Dynamic Price Labels */}
             <div className="absolute right-0 top-0 space-y-8 text-xs font-mono text-trading-muted">
-              <div>$68,500</div>
-              <div>$68,000</div>
-              <div>$67,500</div>
-              <div className="text-bullish">$67,245</div>
-              <div>$67,000</div>
-              <div>$66,500</div>
+              {priceRange.max > 0 && [
+                priceRange.max,
+                priceRange.max - priceSpread * 0.2,
+                priceRange.max - priceSpread * 0.4, 
+                priceData?.price || (priceRange.max - priceSpread * 0.5),
+                priceRange.max - priceSpread * 0.7,
+                priceRange.min
+              ].map((price, index) => (
+                <div 
+                  key={index} 
+                  className={index === 3 ? "text-bullish font-bold" : ""}
+                >
+                  ${price.toFixed(2)}
+                </div>
+              ))}
             </div>
 
-            {/* Time Labels */}
+            {/* Dynamic Time Labels */}
             <div className="absolute bottom-0 left-0 right-8 flex justify-between text-xs font-mono text-trading-muted">
-              <span>10:00</span>
-              <span>10:15</span>
-              <span>10:30</span>
-              <span>10:45</span>
-              <span>11:00</span>
+              {candleData.length >= 5 && [
+                candleData[0]?.time,
+                candleData[Math.floor(candleData.length * 0.25)]?.time,
+                candleData[Math.floor(candleData.length * 0.5)]?.time,
+                candleData[Math.floor(candleData.length * 0.75)]?.time,
+                candleData[candleData.length - 1]?.time
+              ].map((time, index) => (
+                <span key={index}>{time}</span>
+              ))}
             </div>
           </div>
 
