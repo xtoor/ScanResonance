@@ -19,7 +19,7 @@ export default function Landing() {
               className="bg-bullish hover:bg-bullish/90 text-white"
               data-testid="button-login"
             >
-              Sign In with Replit
+              Sign In with GitHub
             </Button>
           </div>
         </div>
@@ -31,6 +31,11 @@ export default function Landing() {
           <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-bullish to-warning bg-clip-text text-transparent">
             Professional Cryptocurrency Breakout Detection
           </h2>
+          <div className="mb-4">
+            <span className="bg-bullish/20 text-bullish px-4 py-2 rounded-full text-lg font-semibold">
+              🎉 Free forever for retail traders
+            </span>
+          </div>
           <p className="text-xl text-trading-muted mb-8 leading-relaxed">
             Real-time scanning across 330+ crypto pairs with advanced breakout algorithms, 
             Discord alerts, and TradingView Pine Script generation. Built for serious traders.
@@ -42,7 +47,7 @@ export default function Landing() {
               className="bg-bullish hover:bg-bullish/90 text-white px-8 py-4 text-lg"
               data-testid="button-get-started"
             >
-              Get Started Free
+              Start Free with GitHub
             </Button>
             <Button 
               variant="outline" 
@@ -151,8 +156,11 @@ export default function Landing() {
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-2xl mx-auto">
           <h3 className="text-3xl font-bold mb-6">Ready to Start Trading?</h3>
-          <p className="text-trading-muted text-lg mb-8">
+          <p className="text-trading-muted text-lg mb-4">
             Join professional traders using Resonance.ai to spot breakouts and maximize profits
+          </p>
+          <p className="text-bullish font-semibold text-lg mb-8">
+            ✨ Always free for retail traders - No hidden fees, No subscriptions
           </p>
           <Button 
             onClick={() => window.location.href = '/api/login'}
@@ -160,7 +168,7 @@ export default function Landing() {
             className="bg-bullish hover:bg-bullish/90 text-white px-8 py-4 text-lg"
             data-testid="button-start-trading"
           >
-            Start Trading Now
+            Start Free with GitHub
           </Button>
         </div>
       </section>
