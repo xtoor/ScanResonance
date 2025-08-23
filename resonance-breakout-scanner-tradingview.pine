@@ -1,0 +1,264 @@
+//@version=5
+indicator("Resonance.ai Breakout Scanner v12.5", shorttitle="Resonance Scanner", overlay=true, max_labels_count=500)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONFIGURATION PANEL
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Scan Mode Selection
+scan_mode = input.string("FAST", "Scan Mode", options=["FAST", "MEDIUM", "SLOW", "CUSTOM"], 
+    tooltip="FAST: Quick breakouts (10 candles, 1.3% threshold)\nMEDIUM: Balanced detection (15 candles, 1.8% threshold)\nSLOW: Conservative detection (20 candles, 2.4% threshold)")
+
+// Custom Mode Parameters (only used when CUSTOM is selected)
+custom_group = "Custom Mode Settings"
+custom_lookback = input.int(15, "Lookback Candles", minval=5, maxval=50, group=custom_group, 
+    tooltip="Number of candles to analyze for breakout detection")
+custom_threshold = input.float(1.8, "Breakout Threshold (%)", minval=0.5, maxval=10.0, step=0.1, group=custom_group, 
+    tooltip="Percentage change required for breakout confirmation")
+custom_volume_ratio = input.float(1.7, "Volume Spike Ratio", minval=1.0, maxval=5.0, step=0.1, group=custom_group, 
+    tooltip="Volume multiplier required for breakout confirmation")
+
+// Alert Settings
+alert_group = "Alert & Visual Settings"
+enable_alerts = input.bool(true, "Enable Alerts", group=alert_group)
+show_labels = input.bool(true, "Show Breakout Labels", group=alert_group)
+show_volume_analysis = input.bool(true, "Show Volume Analysis", group=alert_group)
+show_band_width = input.bool(true, "Show Band Width (W)", group=alert_group)
+
+// Color Settings
+color_group = "Color Settings"
+breakout_color = input.color(color.new(color.lime, 0), "Confirmed Breakout", group=color_group)
+potential_color = input.color(color.new(color.orange, 0), "Potential Breakout", group=color_group)
+bearish_breakout_color = input.color(color.new(color.red, 0), "Bearish Breakout", group=color_group)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SCAN MODE CONFIGURATIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+get_scan_config() =>
+    switch scan_mode
+        "FAST" => [10, 1.3, 1.3]
+        "MEDIUM" => [15, 1.8, 1.7] 
+        "SLOW" => [20, 2.4, 2.2]
+        => [custom_lookback, custom_threshold, custom_volume_ratio]
+
+[lookback_candles, breakout_threshold, volume_spike_ratio] = get_scan_config()
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CORE BREAKOUT DETECTION ALGORITHMS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Calculate Delta (Δ) - Price change percentage
+calculate_delta(lookback) =>
+    if lookback > 0
+        highest_price = ta.highest(high, lookback)
+        lowest_price = ta.lowest(low, lookback)
+        price_range = highest_price - lowest_price
+        current_change = (close - open) / open * 100
+        math.abs(current_change)
+    else
+        0.0
+
+// Calculate Band Width (W) - Volatility measure
+calculate_band_width(lookback) =>
+    if lookback > 0
+        sma_close = ta.sma(close, lookback)
+        upper_band = sma_close + (ta.stdev(close, lookback) * 2)
+        lower_band = sma_close - (ta.stdev(close, lookback) * 2)
+        band_width = (upper_band - lower_band) / sma_close * 100
+        band_width
+    else
+        0.0
+
+// Volume spike detection
+is_volume_spike(ratio_threshold) =>
+    if na(volume) or na(volume[1])
+        false
+    else
+        avg_volume = ta.sma(volume, 20)
+        current_volume_ratio = volume / avg_volume
+        current_volume_ratio >= ratio_threshold
+
+// Multi-timeframe breakout confirmation
+confirm_breakout_multi_mode(delta, band_width, vol_spike) =>
+    // FAST mode confirmation
+    fast_confirmed = delta >= 1.3 and vol_spike and band_width > 0.8
+    
+    // MEDIUM mode confirmation  
+    medium_confirmed = delta >= 1.8 and vol_spike and band_width > 1.2
+    
+    // SLOW mode confirmation
+    slow_confirmed = delta >= 2.4 and vol_spike and band_width > 1.8
+    
+    // Return confirmation level
+    if slow_confirmed
+        3 // All three modes confirm
+    else if medium_confirmed
+        2 // Medium and fast confirm
+    else if fast_confirmed
+        1 // Only fast confirms
+    else
+        0 // No confirmation
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MAIN BREAKOUT ANALYSIS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Calculate key metrics
+delta = calculate_delta(lookback_candles)
+band_width = calculate_band_width(lookback_candles)
+volume_spike = is_volume_spike(volume_spike_ratio)
+
+// Determine breakout direction
+is_bullish_breakout = close > open and delta >= breakout_threshold
+is_bearish_breakout = close < open and delta >= breakout_threshold
+
+// Get confirmation level
+confirmation_level = confirm_breakout_multi_mode(delta, band_width, volume_spike)
+
+// Final breakout conditions
+confirmed_bullish_breakout = is_bullish_breakout and volume_spike and confirmation_level >= 2
+confirmed_bearish_breakout = is_bearish_breakout and volume_spike and confirmation_level >= 2
+potential_breakout = (is_bullish_breakout or is_bearish_breakout) and confirmation_level >= 1
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// VISUAL INDICATORS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Plot breakout signals on chart
+plotshape(
+    confirmed_bullish_breakout and show_labels ? true : na,
+    title="Bullish Breakout",
+    style=shape.triangleup,
+    location=location.belowbar,
+    color=breakout_color,
+    size=size.normal,
+    text="🚀"
+)
+
+plotshape(
+    confirmed_bearish_breakout and show_labels ? true : na,
+    title="Bearish Breakout", 
+    style=shape.triangledown,
+    location=location.abovebar,
+    color=bearish_breakout_color,
+    size=size.normal,
+    text="📉"
+)
+
+plotshape(
+    potential_breakout and not (confirmed_bullish_breakout or confirmed_bearish_breakout) and show_labels ? true : na,
+    title="Potential Breakout",
+    style=shape.diamond,
+    location=location.absolute,
+    color=potential_color,
+    size=size.small,
+    text="⚠"
+)
+
+// Background highlighting for active breakouts
+bgcolor(confirmed_bullish_breakout ? color.new(breakout_color, 95) : na, title="Bullish Breakout Background")
+bgcolor(confirmed_bearish_breakout ? color.new(bearish_breakout_color, 95) : na, title="Bearish Breakout Background")
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INFORMATION DISPLAY
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Create information table
+if barstate.islast and show_volume_analysis
+    var table info_table = table.new(position.top_right, 2, 7, bgcolor=color.new(color.black, 80), border_width=1)
+    
+    // Update table with current values
+    table.cell(info_table, 0, 0, "📊 Resonance Scanner", text_color=color.white, text_size=size.normal)
+    table.cell(info_table, 1, 0, scan_mode + " MODE", text_color=color.yellow, text_size=size.normal)
+    
+    table.cell(info_table, 0, 1, "Δ (Delta):", text_color=color.white, text_size=size.small)
+    table.cell(info_table, 1, 1, str.tostring(delta, "#.##") + "%", 
+        text_color=delta >= breakout_threshold ? color.lime : color.gray, text_size=size.small)
+    
+    table.cell(info_table, 0, 2, "W (Band Width):", text_color=color.white, text_size=size.small)
+    table.cell(info_table, 1, 2, str.tostring(band_width, "#.##") + "%", 
+        text_color=band_width > 1.5 ? color.orange : color.gray, text_size=size.small)
+    
+    table.cell(info_table, 0, 3, "Volume Spike:", text_color=color.white, text_size=size.small)
+    table.cell(info_table, 1, 3, volume_spike ? "✓ YES" : "✗ NO", 
+        text_color=volume_spike ? color.lime : color.red, text_size=size.small)
+    
+    table.cell(info_table, 0, 4, "Confirmation:", text_color=color.white, text_size=size.small)
+    conf_text = confirmation_level == 3 ? "🟢 HIGH" : confirmation_level == 2 ? "🟡 MED" : confirmation_level == 1 ? "🟠 LOW" : "🔴 NONE"
+    table.cell(info_table, 1, 4, conf_text, text_color=color.white, text_size=size.small)
+    
+    table.cell(info_table, 0, 5, "Lookback:", text_color=color.white, text_size=size.small)
+    table.cell(info_table, 1, 5, str.tostring(lookback_candles) + " bars", text_color=color.gray, text_size=size.small)
+    
+    table.cell(info_table, 0, 6, "Threshold:", text_color=color.white, text_size=size.small)
+    table.cell(info_table, 1, 6, str.tostring(breakout_threshold, "#.#") + "%", text_color=color.gray, text_size=size.small)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADVANCED PLOTTING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Plot Delta and Band Width as separate indicators if requested
+if show_band_width
+    hline(breakout_threshold, "Breakout Threshold", color=color.new(color.white, 50), linestyle=hline.style_dashed)
+
+// Volume analysis plot
+volume_ma = ta.sma(volume, 20)
+volume_ratio = na(volume) or na(volume_ma) or volume_ma == 0 ? 0 : volume / volume_ma
+
+// Color volume bars based on breakout status
+volume_color = confirmed_bullish_breakout ? breakout_color : 
+    confirmed_bearish_breakout ? bearish_breakout_color : 
+    potential_breakout ? potential_color : color.gray
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ALERTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Create comprehensive alert messages
+if enable_alerts
+    if confirmed_bullish_breakout
+        alert("🚨 BULLISH BREAKOUT DETECTED!\n" + 
+              "Symbol: " + syminfo.ticker + "\n" + 
+              "Price: $" + str.tostring(close, "#.########") + "\n" + 
+              "Delta (Δ): " + str.tostring(delta, "#.##") + "%\n" + 
+              "Band Width (W): " + str.tostring(band_width, "#.##") + "%\n" + 
+              "Volume Ratio: " + str.tostring(volume_ratio, "#.#") + "x\n" + 
+              "Mode: " + scan_mode + "\n" + 
+              "Confirmation Level: " + str.tostring(confirmation_level) + "/3", 
+              alert.freq_once_per_bar)
+    
+    if confirmed_bearish_breakout
+        alert("🚨 BEARISH BREAKOUT DETECTED!\n" + 
+              "Symbol: " + syminfo.ticker + "\n" + 
+              "Price: $" + str.tostring(close, "#.########") + "\n" + 
+              "Delta (Δ): " + str.tostring(delta, "#.##") + "%\n" + 
+              "Band Width (W): " + str.tostring(band_width, "#.##") + "%\n" + 
+              "Volume Ratio: " + str.tostring(volume_ratio, "#.#") + "x\n" + 
+              "Mode: " + scan_mode + "\n" + 
+              "Confirmation Level: " + str.tostring(confirmation_level) + "/3", 
+              alert.freq_once_per_bar)
+
+    if potential_breakout and not (confirmed_bullish_breakout or confirmed_bearish_breakout)
+        alert("⚠️ POTENTIAL BREAKOUT FORMING!\n" + 
+              "Symbol: " + syminfo.ticker + "\n" + 
+              "Price: $" + str.tostring(close, "#.########") + "\n" + 
+              "Delta (Δ): " + str.tostring(delta, "#.##") + "%\n" + 
+              "Watch for volume confirmation\n" + 
+              "Mode: " + scan_mode, 
+              alert.freq_once_per_bar)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// EXPORT VALUES FOR EXTERNAL USE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Plot invisible lines for external access to values
+plot(delta, title="Delta", display=display.none)
+plot(band_width, title="Band Width", display=display.none) 
+plot(volume_ratio, title="Volume Ratio", display=display.none)
+plot(confirmation_level, title="Confirmation Level", display=display.none)
+
+// Boolean signals for strategy integration
+plot(confirmed_bullish_breakout ? 1 : 0, title="Bullish Breakout Signal", display=display.none)
+plot(confirmed_bearish_breakout ? 1 : 0, title="Bearish Breakout Signal", display=display.none)
+plot(potential_breakout ? 1 : 0, title="Potential Breakout Signal", display=display.none)
