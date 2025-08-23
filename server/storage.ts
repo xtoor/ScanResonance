@@ -72,10 +72,10 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const now = new Date();
     const config: BreakoutConfiguration = { 
-      ...insertConfig, 
       id, 
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
+      ...insertConfig
     };
     this.configurations.set(id, config);
     return config;
@@ -140,9 +140,11 @@ export class MemStorage implements IStorage {
   async savePineScriptCode(insertCode: InsertPineScriptCode): Promise<PineScriptCode> {
     const id = randomUUID();
     const code: PineScriptCode = { 
-      ...insertCode, 
       id,
-      generatedAt: new Date()
+      generatedAt: new Date(),
+      version: insertCode.version,
+      scriptCode: insertCode.scriptCode,
+      configurationId: insertCode.configurationId || null
     };
     this.pineScriptCodes.set(id, code);
     return code;

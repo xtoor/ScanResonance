@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertBreakoutConfigurationSchema, insertBreakoutAlertSchema, insertPineScriptCodeSchema } from "@shared/schema";
-import { generatePineScript } from "../client/src/lib/pineScript";
+import { generatePineScript } from "../client/src/lib/pineScript.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Configuration routes

@@ -1,4 +1,5 @@
 import type { BreakoutConfiguration } from "@shared/schema";
+import { SCAN_MODE_CONFIGS } from './coinList';
 
 export function generatePineScript(config: BreakoutConfiguration): string {
   const {
@@ -13,31 +14,21 @@ export function generatePineScript(config: BreakoutConfiguration): string {
     showLabels
   } = config;
 
-  // Determine candle count and thresholds based on scan mode
+  // Get mode configuration from centralized config
+  const modeConfig = SCAN_MODE_CONFIGS[scanMode as keyof typeof SCAN_MODE_CONFIGS];
   let candleCount: number;
   let modeThreshold: number;
   let modeVolumeRatio: number;
 
-  switch (scanMode) {
-    case 'fast':
-      candleCount = 10;
-      modeThreshold = 0.013;
-      modeVolumeRatio = 1.3;
-      break;
-    case 'medium':
-      candleCount = 15;
-      modeThreshold = 0.018;
-      modeVolumeRatio = 1.7;
-      break;
-    case 'slow':
-      candleCount = 20;
-      modeThreshold = 0.024;
-      modeVolumeRatio = 2.2;
-      break;
-    default:
-      candleCount = lookbackCandles;
-      modeThreshold = breakoutThreshold / 100;
-      modeVolumeRatio = volumeSpikeRatio;
+  if (modeConfig) {
+    candleCount = modeConfig.candleCount;
+    modeThreshold = modeConfig.breakoutThreshold;
+    modeVolumeRatio = modeConfig.volumeSpikeRatio;
+  } else {
+    // Custom mode
+    candleCount = lookbackCandles;
+    modeThreshold = breakoutThreshold / 100;
+    modeVolumeRatio = volumeSpikeRatio;
   }
 
   return `// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/

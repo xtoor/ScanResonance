@@ -5,6 +5,7 @@ import { Play, Square } from "lucide-react";
 import ChartContainer from "./ChartContainer";
 import AlertLog from "./AlertLog";
 import type { BreakoutConfiguration } from "@shared/schema";
+import { POPULAR_PAIRS } from "@/lib/coinList";
 
 interface MainChartAreaProps {
   selectedSymbol: string;
@@ -38,10 +39,9 @@ export default function MainChartArea({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="BTC-USD">BTC-USD</SelectItem>
-                <SelectItem value="ETH-USD">ETH-USD</SelectItem>
-                <SelectItem value="SOL-USD">SOL-USD</SelectItem>
-                <SelectItem value="ADA-USD">ADA-USD</SelectItem>
+                {POPULAR_PAIRS.map(pair => (
+                  <SelectItem key={pair} value={pair}>{pair}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
             

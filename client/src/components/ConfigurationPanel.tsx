@@ -166,6 +166,19 @@ export default function ConfigurationPanel({
             </div>
 
             <div className="mt-4">
+              <Label className="block text-sm font-medium mb-2">Discord Webhook URL (Optional)</Label>
+              <Input
+                type="url"
+                value={(configuration as any).discordWebhook || ""}
+                onChange={(e) => handleInputChange("discordWebhook" as any, e.target.value)}
+                className="w-full bg-trading-darker border-trading-border text-trading-text text-sm mb-4"
+                placeholder="https://discord.com/api/webhooks/..."
+                data-testid="input-discord-webhook"
+              />
+              <div className="text-xs text-trading-muted mb-4">Enable Discord notifications for breakout alerts</div>
+            </div>
+
+            <div>
               <Label className="block text-sm font-medium mb-2">Alert Message Template</Label>
               <Textarea
                 rows={3}
@@ -175,6 +188,7 @@ export default function ConfigurationPanel({
                 placeholder="🚨 BREAKOUT: {{symbol}} at ${{price}} | +{{change}}% | Vol: {{volume}}x"
                 data-testid="textarea-alert-template"
               />
+              <div className="text-xs text-trading-muted mt-1">Variables: symbol, price, change, volume, modes, bandWidth (use with double braces)</div>
             </div>
           </CardContent>
         </Card>
