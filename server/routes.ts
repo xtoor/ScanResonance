@@ -1,27 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./githubAuth";
 import { insertBreakoutConfigurationSchema, insertBreakoutAlertSchema, insertPineScriptCodeSchema } from "@shared/schema";
 import { generatePineScript } from "../client/src/lib/pineScript.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
-
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const user = req.user; // GitHub auth stores user directly
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
-
-  // Configuration routes (protected)
-  app.get("/api/configurations", isAuthenticated, async (req, res) => {
+  // Configuration routes
+  app.get("/api/configurations", async (req, res) => {
     try {
       const configurations = await storage.getAllConfigurations();
       res.json(configurations);
@@ -30,7 +15,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/configurations/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/configurations/:id", async (req, res) => {
     try {
       const configuration = await storage.getConfiguration(req.params.id);
       if (!configuration) {
@@ -42,7 +27,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/configurations", isAuthenticated, async (req, res) => {
+  app.post("/api/configurations", async (req, res) => {
     try {
       const validatedData = insertBreakoutConfigurationSchema.parse(req.body);
       const configuration = await storage.createConfiguration(validatedData);
@@ -52,7 +37,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/configurations/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/configurations/:id", async (req, res) => {
     try {
       const partialData = insertBreakoutConfigurationSchema.partial().parse(req.body);
       const configuration = await storage.updateConfiguration(req.params.id, partialData);
@@ -62,7 +47,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/configurations/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/configurations/:id", async (req, res) => {
     try {
       const deleted = await storage.deleteConfiguration(req.params.id);
       if (!deleted) {
@@ -74,7 +59,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Alert routes (public for scanner service)
+  // Alert routes
   app.get("/api/alerts", async (req, res) => {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
@@ -107,8 +92,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Pine Script generation routes (protected)
-  app.get("/api/pine-script/:configurationId", isAuthenticated, async (req, res) => {
+  // Pine Script generation routes
+  app.get("/api/pine-script/:configurationId", async (req, res) => {
     try {
       const configuration = await storage.getConfiguration(req.params.configurationId);
       if (!configuration) {
@@ -133,7 +118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/pine-script/regenerate/:configurationId", isAuthenticated, async (req, res) => {
+  app.post("/api/pine-script/regenerate/:configurationId", async (req, res) => {
     try {
       const configuration = await storage.getConfiguration(req.params.configurationId);
       if (!configuration) {
