@@ -6,6 +6,7 @@ import ChartContainer from "./ChartContainer";
 import AlertLog from "./AlertLog";
 import type { BreakoutConfiguration } from "@shared/schema";
 import { POPULAR_PAIRS } from "@/lib/coinList";
+import { usePriceData } from "@/lib/priceService";
 
 interface MainChartAreaProps {
   selectedSymbol: string;
@@ -28,6 +29,7 @@ export default function MainChartArea({
   onStopScanning,
   configuration
 }: MainChartAreaProps) {
+  const { priceData, loading } = usePriceData(selectedSymbol);
   return (
     <main className="flex-1 flex flex-col">
       {/* Chart Header with Controls */}
@@ -88,19 +90,32 @@ export default function MainChartArea({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="bg-trading-card border-trading-border p-3">
             <div className="text-xs text-trading-muted mb-1">Current Price</div>
-            <div className="text-lg font-mono font-bold" data-testid="text-current-price">$67,245.32</div>
+            <div className="text-lg font-mono font-bold" data-testid="text-current-price">
+              {loading ? '...' : priceData ? `$${priceData.price.toFixed(8)}` : '$0.00000000'}
+            </div>
           </Card>
           <Card className="bg-trading-card border-trading-border p-3">
             <div className="text-xs text-trading-muted mb-1">Δ (% Change)</div>
-            <div className="text-lg font-mono font-bold text-bullish" data-testid="text-percent-change">+2.34%</div>
+            <div 
+              className={`text-lg font-mono font-bold ${
+                (priceData?.percentChange ?? 0) >= 0 ? 'text-bullish' : 'text-bearish'
+              }`} 
+              data-testid="text-percent-change"
+            >
+              {loading ? '...' : priceData ? `${priceData.percentChange >= 0 ? '+' : ''}${priceData.percentChange.toFixed(2)}%` : '+0.00%'}
+            </div>
           </Card>
           <Card className="bg-trading-card border-trading-border p-3">
             <div className="text-xs text-trading-muted mb-1">W (Band Width)</div>
-            <div className="text-lg font-mono font-bold text-warning" data-testid="text-band-width">1.87%</div>
+            <div className="text-lg font-mono font-bold text-warning" data-testid="text-band-width">
+              {loading ? '...' : priceData ? `${priceData.bandWidth.toFixed(2)}%` : '0.00%'}
+            </div>
           </Card>
           <Card className="bg-trading-card border-trading-border p-3">
             <div className="text-xs text-trading-muted mb-1">Volume Ratio</div>
-            <div className="text-lg font-mono font-bold" data-testid="text-volume-ratio">2.1x</div>
+            <div className="text-lg font-mono font-bold" data-testid="text-volume-ratio">
+              {loading ? '...' : priceData ? `${priceData.volumeRatio.toFixed(1)}x` : '0.0x'}
+            </div>
           </Card>
         </div>
       </div>
