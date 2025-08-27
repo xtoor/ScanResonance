@@ -1,7 +1,7 @@
 // This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
-// © ResonanceAI
+// © ResonanceAI 2025
 
-//@version=5
+//@version=6
 indicator("Resonance.ai Breakout Scanner v12.5", overlay=true, max_bars_back=500)
 
 // ===== INPUT PARAMETERS =====
@@ -56,29 +56,16 @@ percentChange = ((endPrice - startPrice) / startPrice) * 100
 
 // ===== VISUALIZATION =====
 // Plot breakout signals
-plotshape(
-    confirmedBreakout and showSignalLabels, 
-    title="Confirmed Breakout", 
-    location=location.belowbar, 
-    color=breakoutCol, 
-    style=shape.triangleup, 
-    size=size.normal,
-    text="🚨"
-)
 
-plotshape(
-    potentialBreakout and not confirmedBreakout and showSignalLabels, 
-    title="Potential Breakout", 
-    location=location.belowbar, 
-    color=potentialCol, 
-    style=shape.triangleup, 
-    size=size.small,
-    text="⚠️"
-)
+
+plotshape(confirmedBreakout and showSignalLabels, title="Confirmed Breakout", location=location.belowbar, color=breakoutCol, style=shape.triangleup, size=size.normal, text="🚨")
+
+
+plotshape(potentialBreakout and not confirmedBreakout and showSignalLabels, title="Potential Breakout", location=location.belowbar, color=potentialCol, style=shape.triangleup, size=size.small, text="⚠️")
 
 // Volume histogram overlay
 volumeColor = volume > avgVolume * 1.5 ? breakoutCol : volume > avgVolume ? potentialCol : color.gray
-plot(showVolume ? volume : na, title="Volume", color=volumeColor, style=plot.style_histogram, transp=70)
+plot(showVolume ? volume : na, title="Volume", color=color.new(volumeColor, 70), style=plot.style_histogram)
 
 // Background highlighting for breakouts
 bgcolor(confirmedBreakout ? color.new(breakoutCol, 90) : na, title="Breakout Background")
