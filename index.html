@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resonance.ai Breakout Scanner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0e1116;
+            --secondary: #161b22;
+            --accent: #2383e2;
+            --text-primary: #f0f6fc;
+            --text-secondary: #c9d1d9;
+            --success: #3fb950;
+            --warning: #d29922;
+            --danger: #f85149;
+            --card-bg: #1c2129;
+            --border-color: #30363d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+        
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .version {
+            background-color: var(--accent);
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .status {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--success);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+        
+        .status::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .app-preview {
+            background-color: var(--secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .app-preview img {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .caption {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .feature-desc {
+            color: var(--text-secondary);
+        }
+        
+        .why-use {
+            background-color: var(--secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+        
+        .benefits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .benefit {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .benefit-icon {
+            color: var(--success);
+            margin-right: 1rem;
+            font-size: 1.2rem;
+            margin-top: 0.2rem;
+        }
+        
+        .install-section {
+            margin-bottom: 3rem;
+        }
+        
+        .code-block {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .code-block code {
+            color: var(--text-primary);
+        }
+        
+        .command {
+            color: var(--accent);
+        }
+        
+        .comment {
+            color: var(--text-secondary);
+        }
+        
+        .fork-note {
+            background-color: var(--card-bg);
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            margin: 2rem 0;
+            border-radius: 4px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--accent);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .btn:hover {
+            background-color: #1a6cbb;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                display: block;
+                text-align: center;
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">Resonance.ai</div>
+            <div class="tagline">Breakout Scanner</div>
+            <div class="version">V12.5 <span class="status">Connected</span></div>
+            <p>AI-powered cryptocurrency breakout detection in real-time</p>
+        </header>
+        
+        <div class="fork-note">
+            <p><strong>Note:</strong> This is a fork of the original work by metteyya. Check out his GitHub: <a href="https://github.com/metteyya" style="color: var(--accent);">https://github.com/metteyya</a></p>
+        </div>
+        
+        <div class="app-preview">
+            <img src="https://via.placeholder.com/800x450/1c2129/2383e2?text=Resonance.ai+Breakout+Scanner+UI" alt="Resonance.ai Breakout Scanner Interface">
+            <p class="caption">Sleek, dark-mode interface optimized for extended trading sessions</p>
+        </div>
+        
+        <h2 class="section-title">Overview</h2>
+        <p style="text-align: center; margin-bottom: 2rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+            Resonance.ai Breakout Scanner is an advanced, AI-powered tool designed for cryptocurrency traders to identify breakout opportunities in real-time. By analyzing price action, volume spikes, and technical indicators across multiple trading pairs, it helps users spot potential market movements before they fully develop.
+        </p>
+        
+        <h2 class="section-title">Key Features</h2>
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                <h3 class="feature-title">Multi-Mode Scanning</h3>
+                <p class="feature-desc">
+                    Choose from Fast, Medium, or Slow scanning modes with different candle counts and threshold percentages. Adapt to market volatility with real-time status indicators showing active scans across hundreds of pairs.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                <h3 class="feature-title">Real-Time Asset Monitoring</h3>
+                <p class="feature-desc">
+                    Track essential metrics for popular cryptocurrency pairs including current price, percentage change, band width, and volume ratio. Get live updates with intuitive visual indicators.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-sliders-h"></i></div>
+                <h3 class="feature-title">Customizable Breakout Parameters</h3>
+                <p class="feature-desc">
+                    Set your preferred breakout threshold and volume spike ratio. Visual bar charts help distinguish between confirmed breakouts and potential breakouts for better decision making.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-bell"></i></div>
+                <h3 class="feature-title">Recent Alerts System</h3>
+                <p class="feature-desc">
+                    Receive instant notifications for detected breakouts with timestamps, price information, percentage changes, and volume multipliers. Status indicators help you act quickly on emerging opportunities.
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-desktop"></i></div>
+                <h3 class="feature-title">User-Friendly Interface</h3>
+                <p class="feature-desc">
+                    Dark theme reduces eye strain during prolonged use. Connection status ensures reliable data feeds, while scanning controls and timeframe selection provide seamless operation.
+                </p>
+            </div>
+        </div>
+        
+        <div class="why-use">
+            <h2 class="section-title">Why Use Resonance.ai Breakout Scanner?</h2>
+            <div class="benefits">
+                <div class="benefit">
+                    <div class="benefit-icon"><i class="fas fa-brain"></i></div>
+                    <div>
+                        <h3>AI-Driven Accuracy</h3>
+                        <p>Leverages advanced algorithms to filter noise and focus on high-probability breakouts</p>
+                    </div>
+                </div>
+                
+                <div class="benefit">
+                    <div class="benefit-icon"><i class="fas fa-expand-arrows-alt"></i></div>
+                    <div>
+                        <h3>Scalability</h3>
+                        <p>Monitors 200+ pairs simultaneously without performance lag</p>
+                    </div>
+                </div>
+                
+                <div class="benefit">
+                    <div class="benefit-icon"><i class="fas fa-cogs"></i></div>
+                    <div>
+                        <h3>Customization</h3>
+                        <p>Tailor thresholds and modes to your risk tolerance and trading style</p>
+                    </div>
+                </div>
+                
+                <div class="benefit">
+                    <div class="benefit-icon"><i class="fas fa-chart-pie"></i></div>
+                    <div>
+                        <h3>Actionable Insights</h3>
+                        <p>Combines price, volume, and volatility data for comprehensive decision-making</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="install-section">
+            <h2 class="section-title">Installation</h2>
+            
+            <div class="code-block">
+                <code>
+                    <span class="comment"># Clone the repository</span><br>
+                    <span class="command">git clone</span> https://github.com/xtoor/scanresonance.git<br>
+                    <br>
+                    <span class="comment"># Navigate to the project directory</span><br>
+                    <span class="command">cd</span> scanresonance<br>
+                    <br>
+                    <span class="comment"># Install dependencies</span><br>
+                    <span class="command">npm install</span><br>
+                    <br>
+                    <span class="comment"># Run the application</span><br>
+                    <span class="command">npm start</span>
+                </code>
+            </div>
+            
+            <p style="text-align: center;">For detailed setup instructions, please refer to the Installation Guide.</p>
+        </div>
+        
+        <div style="text-align: center; margin: 2rem 0;">
+            <a href="https://github.com/xtoor/scanresonance" class="btn"><i class="fab fa-github"></i> View on GitHub</a>
+            <a href="#" class="btn btn-secondary"><i class="fas fa-book"></i> Documentation</a>
+            <a href="#" class="btn btn-secondary"><i class="fas fa-download"></i> Download</a>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>This project is licensed under the MIT License - see the LICENSE file for details.</p>
+            <p>© 2023 Resonance.ai Breakout Scanner | Forked from metteyya's original work</p>
+        </div>
+    </footer>
+</body>
+</html>
