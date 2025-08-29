@@ -55,23 +55,45 @@ endPrice = close
 percentChange = ((endPrice - startPrice) / startPrice) * 100
 
 // ===== VISUALIZATION =====
-// Plot breakout signals
+// Plot breakout signals with dynamic visual feedback
+plotshape(
+    confirmedBreakout and showSignalLabels,
+    title="Confirmed Breakout",
+    location=location.belowbar,
+    color=percentChange > 3 ? color.new(breakoutCol, 0) : percentChange > 1.5 ? color.new(breakoutCol, 30) : breakoutCol,
+    style=shape.triangleup,
+    size=percentChange > 3 ? size.large : percentChange > 1.5 ? size.normal : size.small,
+    text=percentChange > 3 ? "🚨 STRONG" : percentChange > 1.5 ? "🚨+" : "🚨"
+)
 
+plotshape(
+    potentialBreakout and not confirmedBreakout and showSignalLabels,
+    title="Potential Breakout",
+    location=location.belowbar,
+    color=volumeRatio > 2 ? color.new(potentialCol, 0) : color.new(potentialCol, 40),
+    style=shape.triangleup,
+    size=volumeRatio > 3 ? size.large : volumeRatio > 2 ? size.normal : size.small,
+    text=volumeRatio > 2 ? "⚠️ HIGH" : "⚠️"
+)
 
-plotshape(confirmedBreakout and showSignalLabels, title="Confirmed Breakout", location=location.belowbar, color=breakoutCol, style=shape.triangleup, size=size.normal, text="🚨")
-
-
-plotshape(potentialBreakout and not confirmedBreakout and showSignalLabels, title="Potential Breakout", location=location.belowbar, color=potentialCol, style=shape.triangleup, size=size.small, text="⚠️")
-
-// Volume histogram overlay
+// Volume histogram overlay with dynamic color and width
 volumeColor = volume > avgVolume * 1.5 ? breakoutCol : volume > avgVolume ? potentialCol : color.gray
-plot(showVolume ? volume : na, title="Volume", color=color.new(volumeColor, 70), style=plot.style_histogram)
+plot(
+    showVolume ? volume : na,
+    title="Volume",
+    color=color.new(volumeColor, 70 - int(math.min((volumeRatio-1)*15, 60))),
+    style=plot.style_histogram,
+    linewidth=volumeRatio > 2.5 ? 3 : volumeRatio > 1.5 ? 2 : 1
+)
 
-// Background highlighting for breakouts
-bgcolor(confirmedBreakout ? color.new(breakoutCol, 90) : na, title="Breakout Background")
+// Background highlighting for breakouts, more visible for strong changes
+bgcolor(
+    confirmedBreakout ? color.new(breakoutCol, percentChange > 3 ? 40 : 70) : na,
+    title="Breakout Background"
+)
 
 // ===== DATA TABLE =====
-// Display key metrics
+// Display key metrics with dynamic colors and backgrounds
 var table infoTable = table.new(position.top_right, 3, 6, bgcolor=color.white, border_width=1)
 
 if barstate.islast and showSignalLabels
@@ -80,21 +102,49 @@ if barstate.islast and showSignalLabels
     table.cell(infoTable, 2, 0, "Status", text_color=color.black, bgcolor=color.gray)
     
     table.cell(infoTable, 0, 1, "Δ (Change %)", text_color=color.black)
-    table.cell(infoTable, 1, 1, str.tostring(percentChange, "#.##") + "%", text_color=percentChange > 0 ? color.green : color.red)
-    table.cell(infoTable, 2, 1, percentChange > 2 ? "Strong" : percentChange > 0 ? "Positive" : "Negative", text_color=color.black)
-    
+    table.cell(infoTable, 1, 1,
+        str.tostring(percentChange, "#.##") + "%",
+        text_color=percentChange > 3 ? color.green : percentChange > 0 ? color.orange : color.red,
+        bgcolor=percentChange > 3 ? color.new(color.green, 70) : na
+    )
+    table.cell(infoTable, 2, 1,
+        percentChange > 3 ? "Strong" : percentChange > 0 ? "Positive" : "Negative",
+        text_color=percentChange > 3 ? color.green : percentChange > 0 ? color.orange : color.red
+    )
+
     table.cell(infoTable, 0, 2, "W (Band Width)", text_color=color.black)
-    table.cell(infoTable, 1, 2, str.tostring(bandWidth, "#.##") + "%", text_color=color.blue)
-    table.cell(infoTable, 2, 2, bandWidth > 3 ? "High Vol" : bandWidth > 1.5 ? "Medium" : "Low", text_color=color.black)
-    
+    table.cell(infoTable, 1, 2,
+        str.tostring(bandWidth, "#.##") + "%",
+        text_color=bandWidth > 3 ? color.blue : bandWidth > 1.5 ? color.aqua : color.gray,
+        bgcolor=bandWidth > 3 ? color.new(color.blue, 70) : na
+    )
+    table.cell(infoTable, 2, 2,
+        bandWidth > 3 ? "High Vol" : bandWidth > 1.5 ? "Medium" : "Low",
+        text_color=bandWidth > 3 ? color.blue : bandWidth > 1.5 ? color.aqua : color.gray
+    )
+
     table.cell(infoTable, 0, 3, "Volume Ratio", text_color=color.black)
-    table.cell(infoTable, 1, 3, str.tostring(volumeRatio, "#.#") + "x", text_color=volumeRatio > 2 ? color.green : color.orange)
-    table.cell(infoTable, 2, 3, volumeRatio > volumeThreshold ? "✔ Pass" : "✘ Fail", text_color=color.black)
-    
+    table.cell(infoTable, 1, 3,
+        str.tostring(volumeRatio, "#.#") + "x",
+        text_color=volumeRatio > 2.5 ? color.green : volumeRatio > 1.5 ? color.orange : color.red,
+        bgcolor=volumeRatio > 2.5 ? color.new(color.green, 80) : na
+    )
+    table.cell(infoTable, 2, 3,
+        volumeRatio > volumeThreshold ? "✔ Pass" : "✘ Fail",
+        text_color=volumeRatio > volumeThreshold ? color.green : color.red
+    )
+
     table.cell(infoTable, 0, 4, "Dollar Volume", text_color=color.black)
-    table.cell(infoTable, 1, 4, str.tostring(dollarVolume/1000, "#") + "K", text_color=color.purple)
-    table.cell(infoTable, 2, 4, dollarVolumeCheck ? "✔ Pass" : "✘ Fail", text_color=color.black)
-    
+    table.cell(infoTable, 1, 4,
+        str.tostring(dollarVolume/1000, "#") + "K",
+        text_color=dollarVolumeCheck ? color.purple : color.red,
+        bgcolor=dollarVolumeCheck ? color.new(color.purple, 70) : na
+    )
+    table.cell(infoTable, 2, 4,
+        dollarVolumeCheck ? "✔ Pass" : "✘ Fail",
+        text_color=dollarVolumeCheck ? color.green : color.red
+    )
+
     table.cell(infoTable, 0, 5, "Scan Mode", text_color=color.black)
     table.cell(infoTable, 1, 5, str.upper(scanMode), text_color=color.black)
     table.cell(infoTable, 2, 5, str.tostring(candleCount) + " bars", text_color=color.black)
