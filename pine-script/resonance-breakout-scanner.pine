@@ -1,5 +1,5 @@
 // This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
-// © ResonanceAI 2025
+// © xtoor 2025
 
 //@version=6
 indicator("Resonance.ai Breakout Scanner v12.5", overlay=true, max_bars_back=500)
