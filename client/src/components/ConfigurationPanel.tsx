@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Gauge, Sliders, Bell, Palette } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Gauge, Sliders, Bell, Palette, TrendingUp } from "lucide-react";
+import TopCoinsPanel from "@/components/TopCoinsPanel";
 import type { BreakoutConfiguration } from "@shared/schema";
 
 interface ConfigurationPanelProps {
@@ -249,6 +251,17 @@ export default function ConfigurationPanel({
             </div>
           </CardContent>
         </Card>
+
+        {/* Top Coins Section */}
+        <Separator className="bg-trading-border" />
+        
+        <TopCoinsPanel 
+          onCoinsSelected={(coinIds) => {
+            console.log(`🎯 Selected ${coinIds.length} top performing coins:`, coinIds.slice(0, 10));
+            // You can integrate this into the scanner by modifying the CRYPTO_PAIRS or 
+            // adding a configuration option to use dynamic top coins
+          }}
+        />
       </div>
     </aside>
   );

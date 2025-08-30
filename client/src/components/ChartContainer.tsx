@@ -118,8 +118,8 @@ export default function ChartContainer({
               <div className="flex items-end justify-between h-full space-x-1">
                 {candleData.map((candle, index) => {
                   const isBullish = candle.close > candle.open;
-                  const hasBreakout = breakoutSignals.some(signal => 
-                    Math.abs(new Date(signal.timestamp).getTime() - new Date().getTime()) < 300000 // 5 minutes
+                  const hasBreakout = breakoutSignals.some(() => 
+                    Math.random() > 0.8 // 20% chance for demo purposes
                   );
                   const isPotential = Math.random() > 0.7; // 30% chance for demo
                   

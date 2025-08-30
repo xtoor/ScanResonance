@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertBreakoutConfigurationSchema, insertBreakoutAlertSchema, insertPineScriptCodeSchema } from "@shared/schema";
 import { generatePineScript } from "../client/src/lib/pineScript.js";
+import { topCoinsService } from "./topCoinsService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Configuration routes
@@ -135,6 +136,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(pineScript);
     } catch (error) {
       res.status(500).json({ error: "Failed to regenerate Pine Script" });
+    }
+  });
+
+  // Top Coins routes (from top50coinsfetcher.py)
+  app.get("/api/top-coins", async (req, res) => {
+    try {
+      const topN = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const config = { topN };
+      
+      const service = new (await import("./topCoinsService")).TopCoinsService(config);
+      const topCoins = await service.getTopCoins();
+      
+      res.json({
+        coins: topCoins,
+        count: topCoins.length,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error fetching top coins:', error);
+      res.status(500).json({ error: "Failed to fetch top coins" });
+    }
+  });
+
+  app.get("/api/top-coins/ids", async (req, res) => {
+    try {
+      const topN = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const config = { topN };
+      
+      const service = new (await import("./topCoinsService")).TopCoinsService(config);
+      const topCoinIds = await service.getTopCoinIds();
+      
+      res.json({
+        coinIds: topCoinIds,
+        count: topCoinIds.length,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error fetching top coin IDs:', error);
+      res.status(500).json({ error: "Failed to fetch top coin IDs" });
+    }
+  });
+
+  app.post("/api/top-coins/refresh", async (req, res) => {
+    try {
+      const { topN = 50, minUsdPerMin = 2000, maxSpreadPct = 0.005 } = req.body;
+      const config = { topN, minUsdPerMin, maxSpreadPct };
+      
+      const service = new (await import("./topCoinsService")).TopCoinsService(config);
+      const topCoins = await service.getTopCoins();
+      
+      res.json({
+        message: "Top coins refreshed successfully",
+        coins: topCoins,
+        count: topCoins.length,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error refreshing top coins:', error);
+      res.status(500).json({ error: "Failed to refresh top coins" });
     }
   });
 
