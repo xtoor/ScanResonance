@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>Resonance-Scanner</Name>
+  <Repository>resonance-scanner:latest</Repository>
+  <Registry>https://hub.docker.com/</Registry>
+  <Network>bridge</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/your-repo/resonance-scanner</Support>
+  <Project>https://github.com/your-repo/resonance-scanner</Project>
+  <Overview>Resonance.ai Breakout Scanner v12.5 - Professional cryptocurrency breakout detection with real-time monitoring across 330+ trading pairs. Features configurable scanning modes (FAST/MEDIUM/SLOW), TradingView integration, dynamic top coins selection, and comprehensive alert systems.</Overview>
+  <Category>Financial: Trading Tools Network:Web Network:Other</Category>
+  <WebUI>http://[IP]:[PORT:5000]/</WebUI>
+  <TemplateURL/>
+  <Icon>https://raw.githubusercontent.com/your-repo/resonance-scanner/main/icon.png</Icon>
+  <ExtraParams>--restart=unless-stopped</ExtraParams>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled>1704067200</DateInstalled>
+  <DonateText/>
+  <DonateLink/>
+  <Requires/>
+  <Config Name="WebUI Port" Target="5000" Default="5000" Mode="tcp" Description="Port for the web interface" Type="Port" Display="always" Required="true" Mask="false">5000</Config>
+  <Config Name="Database Data" Target="/var/lib/postgresql/data" Default="/mnt/user/appdata/resonance-scanner/postgres" Mode="rw" Description="PostgreSQL database files" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/resonance-scanner/postgres</Config>
+  <Config Name="App Data" Target="/app/data" Default="/mnt/user/appdata/resonance-scanner/data" Mode="rw" Description="Application data and configuration" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/resonance-scanner/data</Config>
+  <Config Name="Logs" Target="/app/logs" Default="/mnt/user/appdata/resonance-scanner/logs" Mode="rw" Description="Application logs" Type="Path" Display="always" Required="false" Mask="false">/mnt/user/appdata/resonance-scanner/logs</Config>
+  <Config Name="Database Password" Target="POSTGRES_PASSWORD" Default="secure_password_change_me" Mode="" Description="PostgreSQL database password - CHANGE THIS!" Type="Variable" Display="always" Required="true" Mask="true">secure_password_change_me</Config>
+  <Config Name="Database URL" Target="DATABASE_URL" Default="postgresql://scanner_user:secure_password_change_me@postgres:5432/resonance_scanner" Mode="" Description="Database connection string" Type="Variable" Display="always" Required="true" Mask="false">postgresql://scanner_user:secure_password_change_me@postgres:5432/resonance_scanner</Config>
+  <Config Name="Default Scan Mode" Target="DEFAULT_SCAN_MODE" Default="fast" Mode="" Description="Default scanning mode: fast, medium, or slow" Type="Variable" Display="always" Required="false" Mask="false">fast</Config>
+  <Config Name="Max Concurrent Scans" Target="MAX_CONCURRENT_SCANS" Default="10" Mode="" Description="Maximum number of concurrent scans" Type="Variable" Display="always" Required="false" Mask="false">10</Config>
+  <Config Name="Discord Webhook" Target="DISCORD_WEBHOOK_URL" Default="" Mode="" Description="Discord webhook URL for alerts (optional)" Type="Variable" Display="always" Required="false" Mask="false"></Config>
+  <Config Name="SMTP Host" Target="SMTP_HOST" Default="smtp.gmail.com" Mode="" Description="SMTP server for email alerts (optional)" Type="Variable" Display="advanced" Required="false" Mask="false">smtp.gmail.com</Config>
+  <Config Name="SMTP Port" Target="SMTP_PORT" Default="587" Mode="" Description="SMTP server port" Type="Variable" Display="advanced" Required="false" Mask="false">587</Config>
+  <Config Name="SMTP User" Target="SMTP_USER" Default="" Mode="" Description="SMTP username for email alerts" Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
+  <Config Name="SMTP Password" Target="SMTP_PASS" Default="" Mode="" Description="SMTP password for email alerts" Type="Variable" Display="advanced" Required="false" Mask="true"></Config>
+</Container>
