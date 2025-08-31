@@ -3,7 +3,7 @@
 ## 📦 Step 1: Extract Files
 ```bash
 # Extract to unraid appdata directory  
-tar -xzf resonance-scanner-unraid-final-working-v12.5.tar.gz -C /mnt/user/appdata/
+tar -xzf resonance-scanner-unraid-node18-fix-v12.5.tar.gz -C /mnt/user/appdata/
 cd /mnt/user/appdata/resonance-breakout-scanner/
 ```
 
@@ -37,7 +37,8 @@ docker-compose ps
 - **Configuration Panel**: Adjust scan settings
 
 ## ✅ Fixed Issues:
-- ✅ **Production build path issue** - Switched to development mode to avoid bundling issues
+- ✅ **Node.js 18 compatibility** - Automatically patches vite.config.ts on startup
+- ✅ **import.meta.dirname fix** - Replaces with process.cwd() for Docker compatibility
 - ✅ **DevDependencies install fix** - Build tools (vite, drizzle-kit) now properly installed
 - ✅ **Special characters in passwords** now supported (`@`, `#`, `%`, etc.)  
 - ✅ **Removed obsolete version field** from docker-compose.yml

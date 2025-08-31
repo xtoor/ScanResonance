@@ -1,0 +1,48 @@
+RESONANCE.AI BREAKOUT SCANNER - DOCKER FIX SUMMARY
+===================================================
+
+FINAL WORKING PACKAGE: resonance-scanner-unraid-node18-fix-v12.5.tar.gz (1.9MB)
+
+ISSUES IDENTIFIED AND FIXED:
+============================
+
+1. ❌ ORIGINAL ISSUE: "sh: vite: not found"
+   ✅ FIXED: Added --include=dev to npm install to install build tools
+
+2. ❌ SECOND ISSUE: Production build path.resolve() error  
+   ✅ FIXED: Switched to development mode to avoid bundling issues
+
+3. ❌ FINAL ISSUE: "import.meta.dirname" undefined in Node.js 18
+   ✅ FIXED: Added docker-startup-fix.sh that patches vite.config.ts automatically
+
+ROOT CAUSE:
+===========
+- Docker node:18-alpine doesn't support import.meta.dirname in tsx
+- vite.config.ts uses import.meta.dirname for path resolution
+- Caused container restart loop on startup
+
+SOLUTION:
+=========
+- Startup script automatically replaces import.meta.dirname with process.cwd()
+- This provides Docker-compatible path resolution
+- No manual file editing required
+
+INSTALLATION:
+=============
+1. tar -xzf resonance-scanner-unraid-node18-fix-v12.5.tar.gz -C /mnt/user/appdata/
+2. cd /mnt/user/appdata/resonance-breakout-scanner/
+3. nano .env (set your password: spider1234@U)
+4. docker-compose up -d
+5. Access: http://[unraid-ip]:5000
+
+FEATURES:
+=========
+✅ Real-time scanning of 312+ crypto pairs
+✅ 50+ top breakout candidates detection
+✅ Professional TradingView-style interface
+✅ Dynamic coin selection and filtering
+✅ Alert system support
+✅ PostgreSQL database with automatic schema sync
+✅ Special character password support (@, #, %, etc.)
+
+STATUS: READY FOR DEPLOYMENT 🚀
