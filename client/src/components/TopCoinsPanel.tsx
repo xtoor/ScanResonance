@@ -95,7 +95,6 @@ export default function TopCoinsPanel({ onCoinsSelected, className }: TopCoinsPa
           Dynamic top-performing cryptocurrency pairs based on volatility and liquidity
         </CardDescription>
       </CardHeader>
-
       <CardContent className="space-y-6">
         {/* Configuration Controls */}
         <div className="space-y-4">
@@ -116,9 +115,7 @@ export default function TopCoinsPanel({ onCoinsSelected, className }: TopCoinsPa
               />
             </div>
             <div>
-              <Label htmlFor="minVolume" className="text-sm text-trading-muted">
-                Min Volume (USD/min)
-              </Label>
+              <Label htmlFor="minVolume" className="text-sm text-trading-muted">Min Vol (USD/min)</Label>
               <Input
                 id="minVolume"
                 type="number"
