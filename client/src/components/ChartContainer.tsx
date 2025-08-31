@@ -98,7 +98,7 @@ export default function ChartContainer({
     return ((priceRange.max - Math.max(candle.open, candle.close)) / priceSpread) * 200;
   };
   return (
-    <div className="flex-1 relative bg-trading-darker">
+    <div className="flex-1 relative bg-trading-darker ml-[-199px] mr-[-199px]">
       <div className="absolute inset-0 p-6 pl-[200px] pr-[200px] ml-[199px] mr-[199px]">
         <Card className="w-full h-full bg-trading-dark border-trading-border relative overflow-hidden">
           {/* Chart Grid Background */}
@@ -156,7 +156,7 @@ export default function ChartContainer({
                             style={{ backgroundColor: configuration.potentialColor || "#FF9800" }}
                             data-testid="potential-signal"
                           >
-                            ⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL$111089.42$110198.77$109308.13$108706.43$107972.16$106636.2010:08 AM10:33 AM10:58 AM11:23 AM11:43 AMConfirmed BreakoutPotential BreakoutVolume
+                            ⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL$111089.42$110198.77$109308.13$108706.43$107972.16$106636.2010:08 AM10:33 AM10:58 AM11:23 AM11:43 AMConfirmed BreakoutPotential BreakoutVolume⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL$111089.42$110198.77$109308.13$108706.43$107972.16$106636.2010:08 AM10:33 AM10:58 AM11:23 AM11:43 AMConfirmed BreakoutPotential BreakoutVolume⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL$111089.42$110198.77$109308.13$108706.43$107972.16$106636.2010:08 AM10:33 AM10:58 AM11:23 AM11:43 AMConfirmed BreakoutPotential BreakoutVolume⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL⚠ POTENTIAL$111089.42$110198.77$109308.13$108706.43$107972.16$106636.2010:08 AM10:33 AM10:58 AM11:23 AM11:43 AMConfirmed BreakoutPotential BreakoutVolume$111878.73$110731.41$109584.08$108811.43$107863.09$106142.1010:23 AM10:48 AM11:13 AM11:38 AM11:58 AMConfirmed BreakoutPotential BreakoutVolume
                           </div>
                           <div 
                             className="absolute top-0 left-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent transform -translate-x-1/2 -translate-y-1"
