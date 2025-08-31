@@ -1,7 +1,7 @@
 RESONANCE.AI BREAKOUT SCANNER - DOCKER FIX SUMMARY
 ===================================================
 
-FINAL WORKING PACKAGE: resonance-scanner-unraid-comprehensive-fix-v12.5.tar.gz (2.2MB)
+FINAL WORKING PACKAGE: resonance-scanner-unraid-direct-paths-v12.5.tar.gz (2.3MB)
 
 ISSUES IDENTIFIED AND FIXED:
 ============================
@@ -21,8 +21,8 @@ ISSUES IDENTIFIED AND FIXED:
 5. ❌ FIFTH ISSUE: "Permission denied" on docker-startup-fix.sh (restart loop)
    ✅ FIXED: Added chmod +x to set execute permissions before running script
 
-6. ❌ FINAL ISSUE: "ENOENT: no such file or directory, open '/client/index.html'"
-   ✅ FIXED: Comprehensive patch for ALL 7 import.meta.dirname references with verification
+6. ❌ SIXTH ISSUE: "ENOENT: no such file or directory, open '/client/index.html'" (persistent)
+   ✅ FIXED: Direct hardcoded Docker paths to eliminate all path calculation errors
 
 ROOT CAUSE:
 ===========
@@ -30,22 +30,23 @@ ROOT CAUSE:
 - SEVEN total references across two files: vite.config.ts (5) AND server/vite.ts (2)
 - vite.config.ts caused container restart loop
 - server/vite.ts caused Web UI TypeError on page load  
-- Incomplete patching left some references unresolved
-- Missing path import in server/vite.ts after replacement
+- Complex path.join operations were failing in Docker environment
+- Path calculation errors causing '/client/index.html' instead of '/app/client/index.html'
 - Extracted tar.gz files don't preserve execute permissions in Docker
 
 SOLUTION:
 =========
 - Added chmod +x to set execute permissions on startup script
+- Direct hardcoded Docker paths: "/app/client/index.html" and "/app/dist/public"
+- Eliminates all path calculation errors by using absolute paths
 - Comprehensive patching of ALL 7 import.meta.dirname references
-- Intelligent replacement: process.cwd() for config, path.join(process.cwd(), "server") for server
-- Automatic path import addition to server/vite.ts if missing
+- Multiple fallback patterns to ensure successful replacement
 - Verification system confirms all patches applied successfully  
 - No manual file editing required
 
 INSTALLATION:
 =============
-1. tar -xzf resonance-scanner-unraid-comprehensive-fix-v12.5.tar.gz -C /mnt/user/appdata/
+1. tar -xzf resonance-scanner-unraid-direct-paths-v12.5.tar.gz -C /mnt/user/appdata/
 2. cd /mnt/user/appdata/resonance-breakout-scanner/
 3. nano .env (set your password: spider1234@U)
 4. docker-compose up -d

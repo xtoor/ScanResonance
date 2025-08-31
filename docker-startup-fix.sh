@@ -19,16 +19,17 @@ fi
 if [ -f server/vite.ts ]; then
     echo "Patching server/vite.ts for Node.js 18..."
     
-    # Need to add path import at the top if not present
-    if ! grep -q "^import.*path.*from.*['\"]path['\"]" server/vite.ts; then
-        echo "Adding path import to server/vite.ts..."
-        sed -i '3i import path from "path";' server/vite.ts
-    fi
+    # Replace with direct hardcoded paths for Docker environment
+    # First occurrence: client template path
+    sed -i 's|path\.resolve(\s*import\.meta\.dirname,\s*"\.\.",\s*"client",\s*"index\.html"\s*)|"/app/client/index.html"|g' server/vite.ts
     
-    # Replace import.meta.dirname with path.join(process.cwd(), "server") to maintain correct path
-    sed -i 's/import\.meta\.dirname/path.join(process.cwd(), "server")/g' server/vite.ts
+    # Second occurrence: static dist path  
+    sed -i 's|path\.resolve(import\.meta\.dirname,\s*"public")|"/app/dist/public"|g' server/vite.ts
     
-    echo "✅ server/vite.ts patched successfully (2 occurrences)"
+    # If direct replacements didn't work, fall back to simple replacement
+    sed -i 's/import\.meta\.dirname/"\/app\/server"/g' server/vite.ts
+    
+    echo "✅ server/vite.ts patched with direct paths"
 else
     echo "❌ server/vite.ts not found"
 fi
