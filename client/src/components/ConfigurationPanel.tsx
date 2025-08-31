@@ -25,7 +25,7 @@ export default function ConfigurationPanel({
 
   return (
     <aside className="w-80 bg-trading-dark border-r border-trading-border overflow-y-auto ml-[103px] mr-[103px]">
-      <div className="p-4 space-y-6 ml-[-33px] mr-[-33px]">
+      <div className="p-4 space-y-6 ml-[-14px] mr-[-14px]">
         {/* Scanning Modes */}
         <Card className="bg-trading-card border-trading-border">
           <CardHeader className="pb-4">
