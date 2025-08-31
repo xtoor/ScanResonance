@@ -99,7 +99,7 @@ export default function ChartContainer({
   };
   return (
     <div className="flex-1 relative bg-trading-darker">
-      <div className="absolute inset-0 p-6">
+      <div className="absolute inset-0 p-6 pl-[200px] pr-[200px]">
         <Card className="w-full h-full bg-trading-dark border-trading-border relative overflow-hidden">
           {/* Chart Grid Background */}
           <svg className="absolute inset-0 w-full h-full opacity-20">
@@ -156,7 +156,7 @@ export default function ChartContainer({
                             style={{ backgroundColor: configuration.potentialColor || "#FF9800" }}
                             data-testid="potential-signal"
                           >
-                            ⚠ POTENTIAL
+                            ⚠ POTENTIAL⚠ POTENTIAL
                           </div>
                           <div 
                             className="absolute top-0 left-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent transform -translate-x-1/2 -translate-y-1"
