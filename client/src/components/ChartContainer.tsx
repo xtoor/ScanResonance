@@ -99,7 +99,7 @@ export default function ChartContainer({
   };
   return (
     <div className="flex-1 relative bg-trading-darker">
-      <div className="absolute inset-0 p-6">
+      <div className="absolute inset-0 p-6 ml-[135px] mr-[135px]">
         <Card className="w-full h-full bg-trading-dark border-trading-border relative overflow-hidden">
           {/* Chart Grid Background */}
           <svg className="absolute inset-0 w-full h-full opacity-20">
