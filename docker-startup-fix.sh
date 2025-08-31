@@ -19,8 +19,8 @@ fi
 if [ -f server/vite.ts ]; then
     echo "Patching server/vite.ts for Node.js 18..."
     
-    # Replace import.meta.dirname with process.cwd() for Docker compatibility
-    sed -i 's/import\.meta\.dirname/process.cwd()/g' server/vite.ts
+    # Replace import.meta.dirname with path.join(process.cwd(), "server") to maintain correct path
+    sed -i 's/import\.meta\.dirname/path.join(process.cwd(), "server")/g' server/vite.ts
     
     echo "✅ server/vite.ts patched successfully"
 else
