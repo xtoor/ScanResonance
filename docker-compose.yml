@@ -64,7 +64,7 @@ services:
       sh -c "
         echo '🚀 Installing dependencies...' &&
         apk add --no-cache postgresql-client curl &&
-        npm install &&
+        npm install --include=dev &&
         echo '🔧 Building application...' &&
         npm run build &&
         echo '📁 Setting up static files...' &&
