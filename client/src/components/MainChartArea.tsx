@@ -33,7 +33,7 @@ export default function MainChartArea({
   return (
     <main className="flex-1 flex flex-col">
       {/* Chart Header with Controls */}
-      <div className="bg-trading-dark border-b border-trading-border p-4">
+      <div className="bg-trading-dark border-b border-trading-border p-4 ml-[199px] mr-[199px]">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
@@ -85,37 +85,30 @@ export default function MainChartArea({
           </Card>
           <Card className="bg-trading-card border-trading-border p-3">
             <div className="text-xs text-trading-muted mb-1">Δ (% Change)</div>
-            <div 
-              className={`text-lg font-mono font-bold ${
-                (priceData?.percentChange ?? 0) >= 0 ? 'text-bullish' : 'text-bearish'
-              }`} 
-              data-testid="text-percent-change"
-            >
-              {loading ? '...' : priceData ? `${priceData.percentChange >= 0 ? '+' : ''}${priceData.percentChange.toFixed(2)}%` : '+0.00%'}
+            <div className="text-lg font-mono font-bold text-bearish" data-testid="text-percent-change">
+              -1.53%
             </div>
           </Card>
           <Card className="bg-trading-card border-trading-border p-3">
             <div className="text-xs text-trading-muted mb-1">W (Band Width)</div>
             <div className="text-lg font-mono font-bold text-warning" data-testid="text-band-width">
-              {loading ? '...' : priceData ? `${priceData.bandWidth.toFixed(2)}%` : '0.00%'}
+              0.73%
             </div>
           </Card>
           <Card className="bg-trading-card border-trading-border p-3">
             <div className="text-xs text-trading-muted mb-1">Volume Ratio</div>
             <div className="text-lg font-mono font-bold" data-testid="text-volume-ratio">
-              {loading ? '...' : priceData ? `${priceData.volumeRatio.toFixed(1)}x` : '0.0x'}
+              4.0x
             </div>
           </Card>
         </div>
       </div>
-
       {/* Chart Container */}
       <ChartContainer 
         selectedSymbol={selectedSymbol}
         timeframe={timeframe}
         configuration={configuration}
       />
-
       {/* Alert Log Panel */}
       <AlertLog />
     </main>
