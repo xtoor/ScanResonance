@@ -32,7 +32,13 @@ services:
     environment:
       NODE_ENV: production
       PORT: 5000
-      DATABASE_URL: postgresql://scanner_user:${POSTGRES_PASSWORD:-secure_password_change_me}@postgres:5432/resonance_scanner
+      
+      # Database connection (separate components to avoid URL parsing issues)
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: resonance_scanner
+      DB_USER: scanner_user
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-secure_password_change_me}
       
       # Optional Discord Integration
       DISCORD_WEBHOOK_URL: ${DISCORD_WEBHOOK_URL:-}

@@ -34,14 +34,26 @@ Complete Docker setup for unraid and other container platforms.
 ## 🔧 Configuration
 
 ### Required Environment Variables
+
+**Option 1: Individual Components (RECOMMENDED for passwords with special characters)**
 ```env
-# Database (REQUIRED - change the password!)
-POSTGRES_PASSWORD=your_secure_password_here
-DATABASE_URL=postgresql://scanner_user:your_secure_password_here@postgres:5432/resonance_scanner
+# Database (REQUIRED - supports passwords with @, #, %, etc.)
+POSTGRES_PASSWORD=spider1234@U
+DB_HOST=postgres
+DB_PORT=5432
+DB_NAME=resonance_scanner
+DB_USER=scanner_user
+DB_PASSWORD=spider1234@U
 
 # Application
 DEFAULT_SCAN_MODE=fast
 MAX_CONCURRENT_SCANS=10
+```
+
+**Option 2: DATABASE_URL (for simple passwords only)**
+```env
+# Use this only if your password has NO special characters
+DATABASE_URL=postgresql://scanner_user:simple_password@postgres:5432/resonance_scanner
 ```
 
 ### Optional Features

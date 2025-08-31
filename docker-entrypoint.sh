@@ -5,9 +5,21 @@ set -e
 
 echo "🚀 Starting Resonance.ai Breakout Scanner..."
 
+# Build DATABASE_URL from individual components if not already set
+if [ -z "$DATABASE_URL" ] && [ -n "$DB_PASSWORD" ]; then
+    DB_HOST=${DB_HOST:-postgres}
+    DB_PORT=${DB_PORT:-5432}
+    DB_NAME=${DB_NAME:-resonance_scanner}
+    DB_USER=${DB_USER:-scanner_user}
+    
+    echo "🔧 Building DATABASE_URL from individual components..."
+    export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+fi
+
 # Wait for database to be ready
 echo "⏳ Waiting for database to be ready..."
-while ! pg_isready -h postgres -p 5432 -U scanner_user; do
+DB_HOST_FOR_CHECK=${DB_HOST:-postgres}
+while ! pg_isready -h "$DB_HOST_FOR_CHECK" -p 5432 -U scanner_user; do
   echo "Database not ready, waiting..."
   sleep 2
 done
