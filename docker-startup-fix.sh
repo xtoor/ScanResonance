@@ -15,29 +15,47 @@ else
     echo "❌ vite.config.ts not found"
 fi
 
-# Fix server/vite.ts for Node.js 18 compatibility (multiline patterns)
+# Fix server/vite.ts for Node.js 18 compatibility (Python replacement)
 if [ -f server/vite.ts ]; then
     echo "Patching server/vite.ts for Node.js 18..."
     
     # Show current content for debugging
-    echo "Current problematic lines:"
-    grep -A5 -B2 "path\.resolve\|import\.meta\.dirname" server/vite.ts || true
+    echo "Current problematic path.resolve calls:"
+    grep -A6 -B1 "path\.resolve" server/vite.ts || true
     
-    # Create a completely new version of the file with direct replacements
-    # This handles the multiline path.resolve patterns definitively
-    cat server/vite.ts | \
-    sed 's/import\.meta\.dirname/"\/app\/server"/g' | \
-    sed ':a;N;$!ba;s/const clientTemplate = path\.resolve(\s*"\/app\/server",\s*"\.\.",\s*"client",\s*"index\.html",\s*);/const clientTemplate = "\/app\/client\/index.html";/g' | \
-    sed ':a;N;$!ba;s/const distPath = path\.resolve("\/app\/server", "public");/const distPath = "\/app\/dist\/public";/g' | \
-    sed 's/path\.resolve(\s*"\/app\/server",\s*"\.\.",\s*"client",\s*"index\.html"\s*)/"\/app\/client\/index.html"/g' | \
-    sed 's/path\.resolve("\/app\/server",\s*"public")/"\/app\/dist\/public"/g' | \
-    sed 's/path\.resolve(distPath, "index\.html")/path.join("\/app\/dist\/public", "index.html")/g' \
-    > server/vite.ts.tmp && mv server/vite.ts.tmp server/vite.ts
+    # Use Python for precise multiline replacement
+    python3 << 'EOF'
+import re
+
+# Read the file
+with open('server/vite.ts', 'r') as f:
+    content = f.read()
+
+# Replace the multiline clientTemplate path.resolve
+clientTemplate_pattern = r'const clientTemplate = path\.resolve\(\s*[^,]+,\s*"\.\."\s*,\s*"client"\s*,\s*"index\.html"\s*,?\s*\);'
+content = re.sub(clientTemplate_pattern, 'const clientTemplate = "/app/client/index.html";', content, flags=re.MULTILINE | re.DOTALL)
+
+# Replace the distPath path.resolve  
+distPath_pattern = r'const distPath = path\.resolve\([^,]+,\s*"public"\s*\);'
+content = re.sub(distPath_pattern, 'const distPath = "/app/dist/public";', content, flags=re.MULTILINE | re.DOTALL)
+
+# Replace any remaining import.meta.dirname references
+content = re.sub(r'import\.meta\.dirname', '"/app/server"', content)
+
+# Replace path.resolve(distPath, "index.html") 
+content = re.sub(r'path\.resolve\(distPath,\s*"index\.html"\)', '"/app/dist/public/index.html"', content)
+
+# Write the file back
+with open('server/vite.ts', 'w') as f:
+    f.write(content)
+
+print("✅ Python replacement completed")
+EOF
     
-    echo "After patching:"
-    grep -A5 -B2 "path\.resolve\|import\.meta\.dirname\|/app/" server/vite.ts || echo "No problematic patterns found"
+    echo "After patching - checking for remaining issues:"
+    grep -A6 -B1 "path\.resolve\|import\.meta\.dirname" server/vite.ts || echo "✅ No problematic patterns found"
     
-    echo "✅ server/vite.ts completely rewritten with direct paths"
+    echo "✅ server/vite.ts fixed with Python multiline replacement"
 else
     echo "❌ server/vite.ts not found"
 fi

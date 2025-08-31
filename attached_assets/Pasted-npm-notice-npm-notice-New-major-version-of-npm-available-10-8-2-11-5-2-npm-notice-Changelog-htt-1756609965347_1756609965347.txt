@@ -1,0 +1,93 @@
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.5.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.5.2
+npm notice To update run: npm install -g npm@11.5.2
+npm notice
+npm warn using --force Recommended protections disabled.
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+🔧 Fixing Node.js 18 compatibility...
+🔧 Fixing Node.js 18 compatibility issues...
+Patching vite.config.ts for Node.js 18...
+✅ vite.config.ts patched successfully (5 occurrences)
+Patching server/vite.ts for Node.js 18...
+Current problematic lines:
+
+    try {
+      const clientTemplate = path.resolve(
+        process.cwd(),
+        "..",
+        "client",
+        "index.html",
+      );
+--
+
+export function serveStatic(app: Express) {
+  const distPath = path.resolve(process.cwd(), "public");
+
+  if (!fs.existsSync(distPath)) {
+    throw new Error(
+      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+    );
+--
+  // fall through to index.html if the file doesn't exist
+  app.use("*", (_req, res) => {
+    res.sendFile(path.resolve(distPath, "index.html"));
+  });
+}
+After patching:
+
+    try {
+      const clientTemplate = path.resolve(
+        process.cwd(),
+        "..",
+        "client",
+        "index.html",
+      );
+--
+
+export function serveStatic(app: Express) {
+  const distPath = path.resolve(process.cwd(), "public");
+
+  if (!fs.existsSync(distPath)) {
+    throw new Error(
+      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+    );
+--
+  // fall through to index.html if the file doesn't exist
+  app.use("*", (_req, res) => {
+    res.sendFile(path.join("/app/dist/public", "index.html"));
+  });
+}
+✅ server/vite.ts completely rewritten with direct paths
+🔍 Verifying patches...
+✅ All import.meta.dirname references successfully patched
+🎯 Starting application...
+⏳ Waiting for database...
+postgres:5432 - accepting connections
+🗄️ Setting up database schema...
+
+> rest-express@1.0.0 db:push
+> drizzle-kit push
+
+No config path provided, using default 'drizzle.config.ts'
+Reading config file '/app/drizzle.config.ts'
+Using 'pg' driver for database querying
+[⣷] Pulling schema from database...
+[⣯] Pulling schema from database...
+[✓] Pulling schema from database...
+[i] No changes detected
+🎯 Starting Resonance Scanner in development mode...
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+3:11:34 AM [express] serving on port 5000
+3:11:37 AM [express] GET /api/configurations 200 in 4ms :: [{"id":"07a98797-b41b-40ae-87aa-c48819008…
+Error: ENOENT: no such file or directory, open '/client/index.html'
+Error: ENOENT: no such file or directory, open '/client/index.html'
+3:12:07 AM [express] GET /api/configurations 200 in 2ms :: [{"id":"07a98797-b41b-40ae-87aa-c48819008…

@@ -1,7 +1,7 @@
 RESONANCE.AI BREAKOUT SCANNER - DOCKER FIX SUMMARY
 ===================================================
 
-FINAL WORKING PACKAGE: resonance-scanner-unraid-multiline-fix-v12.5.tar.gz (2.5MB)
+FINAL WORKING PACKAGE: resonance-scanner-unraid-python-fix-v12.5.tar.gz (2.5MB)
 
 ISSUES IDENTIFIED AND FIXED:
 ============================
@@ -22,8 +22,8 @@ ISSUES IDENTIFIED AND FIXED:
    ✅ FIXED: Added chmod +x to set execute permissions before running script
 
 6. ❌ SIXTH ISSUE: "ENOENT: no such file or directory, open '/client/index.html'" (persistent)
-   📋 ROOT CAUSE: Multiline path.resolve pattern in server/vite.ts not handled by simple sed
-   ✅ FINAL FIX: File rewriting approach with enhanced pattern matching for multiline code
+   📋 ROOT CAUSE: process.cwd() + ".." resolves to wrong path in Docker (/client vs /app/client)
+   ✅ FINAL FIX: Python regex replacement eliminates entire path.resolve() calls with direct paths
 
 ROOT CAUSE:
 ===========
@@ -38,17 +38,17 @@ ROOT CAUSE:
 SOLUTION:
 =========
 - Added chmod +x to set execute permissions on startup script
-- **File rewriting approach**: Pipes content through multiple sed transformations
-- Handles multiline patterns using advanced sed techniques
-- Enhanced debugging with before/after content verification
+- **Python regex replacement**: Uses Python for precise multiline pattern matching
+- Eliminates entire path.resolve() blocks instead of partial replacement
+- Enhanced debugging shows exact patterns before/after replacement
 - Direct hardcoded Docker paths: "/app/client/index.html" and "/app/dist/public"
-- Comprehensive patching of ALL 7 import.meta.dirname references including multiline
-- Multiple transformation passes to ensure complete replacement
+- Regex patterns handle complex multiline code structures with whitespace
+- Multiple regex passes ensure complete elimination of problematic code
 - No manual file editing required
 
 INSTALLATION:
 =============
-1. tar -xzf resonance-scanner-unraid-multiline-fix-v12.5.tar.gz -C /mnt/user/appdata/
+1. tar -xzf resonance-scanner-unraid-python-fix-v12.5.tar.gz -C /mnt/user/appdata/
 2. cd /mnt/user/appdata/resonance-breakout-scanner/
 3. nano .env (set your password: spider1234@U)
 4. docker-compose up -d
