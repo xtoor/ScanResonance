@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a full-stack trading application called "Resonance.ai Breakout Scanner v12.5" that monitors cryptocurrency price movements and identifies potential breakout patterns. The application provides real-time scanning of multiple crypto pairs, configurable alert systems, and generates PineScript code for TradingView integration. It features a TradingView-style dark interface with comprehensive breakout detection algorithms based on price change thresholds, volume spikes, and customizable scanning modes.
+This is a full-stack trading application called "Resonance.ai Breakout Scanner v12.6" that monitors cryptocurrency price movements and identifies potential breakout patterns. The application provides real-time scanning of multiple crypto pairs, configurable alert systems, and generates PineScript code for TradingView integration. It features a TradingView-style dark interface with comprehensive breakout detection algorithms based on price change thresholds, volume spikes, and customizable scanning modes.
 
 ## User Preferences
 
