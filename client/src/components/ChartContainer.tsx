@@ -98,7 +98,7 @@ export default function ChartContainer({
     return ((priceRange.max - Math.max(candle.open, candle.close)) / priceSpread) * 200;
   };
   return (
-    <div className="flex-1 relative bg-trading-darker ml-[0px] mr-[0px]">
+    <div className="flex-1 relative bg-trading-darker ml-[3px] mr-[3px]">
       <div className="absolute inset-0 p-6 ml-[135px] mr-[135px] pl-[0px] pr-[0px] pt-[0px] pb-[0px]">
         <Card className="w-full h-full bg-trading-dark border-trading-border relative overflow-hidden">
           {/* Chart Grid Background */}
