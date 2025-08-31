@@ -1,7 +1,7 @@
 RESONANCE.AI BREAKOUT SCANNER - DOCKER FIX SUMMARY
 ===================================================
 
-FINAL WORKING PACKAGE: resonance-scanner-unraid-path-fix-v12.5.tar.gz (2.1MB)
+FINAL WORKING PACKAGE: resonance-scanner-unraid-comprehensive-fix-v12.5.tar.gz (2.2MB)
 
 ISSUES IDENTIFIED AND FIXED:
 ============================
@@ -22,28 +22,30 @@ ISSUES IDENTIFIED AND FIXED:
    ✅ FIXED: Added chmod +x to set execute permissions before running script
 
 6. ❌ FINAL ISSUE: "ENOENT: no such file or directory, open '/client/index.html'"
-   ✅ FIXED: Updated path replacement to use path.join(process.cwd(), "server") instead of process.cwd()
+   ✅ FIXED: Comprehensive patch for ALL 7 import.meta.dirname references with verification
 
 ROOT CAUSE:
 ===========
 - Docker node:18-alpine doesn't support import.meta.dirname in tsx
-- TWO files used import.meta.dirname: vite.config.ts AND server/vite.ts
+- SEVEN total references across two files: vite.config.ts (5) AND server/vite.ts (2)
 - vite.config.ts caused container restart loop
-- server/vite.ts caused Web UI TypeError on page load
-- Simple process.cwd() replacement broke path resolution (wrong directory)
+- server/vite.ts caused Web UI TypeError on page load  
+- Incomplete patching left some references unresolved
+- Missing path import in server/vite.ts after replacement
 - Extracted tar.gz files don't preserve execute permissions in Docker
 
 SOLUTION:
 =========
 - Added chmod +x to set execute permissions on startup script
-- Intelligent path replacement: process.cwd() for config, path.join(process.cwd(), "server") for server
-- Patches BOTH vite.config.ts AND server/vite.ts for complete compatibility
-- Maintains correct directory structure and file path resolution
+- Comprehensive patching of ALL 7 import.meta.dirname references
+- Intelligent replacement: process.cwd() for config, path.join(process.cwd(), "server") for server
+- Automatic path import addition to server/vite.ts if missing
+- Verification system confirms all patches applied successfully  
 - No manual file editing required
 
 INSTALLATION:
 =============
-1. tar -xzf resonance-scanner-unraid-path-fix-v12.5.tar.gz -C /mnt/user/appdata/
+1. tar -xzf resonance-scanner-unraid-comprehensive-fix-v12.5.tar.gz -C /mnt/user/appdata/
 2. cd /mnt/user/appdata/resonance-breakout-scanner/
 3. nano .env (set your password: spider1234@U)
 4. docker-compose up -d
