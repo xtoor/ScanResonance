@@ -33,7 +33,7 @@ export default function MainChartArea({
   return (
     <main className="flex-1 flex flex-col">
       {/* Chart Header with Controls */}
-      <div className="bg-trading-dark border-b border-trading-border p-4">
+      <div className="bg-trading-dark border-b border-trading-border p-4 ml-[135px] mr-[135px]">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
@@ -108,14 +108,12 @@ export default function MainChartArea({
           </Card>
         </div>
       </div>
-
       {/* Chart Container */}
       <ChartContainer 
         selectedSymbol={selectedSymbol}
         timeframe={timeframe}
         configuration={configuration}
       />
-
       {/* Alert Log Panel */}
       <AlertLog />
     </main>
