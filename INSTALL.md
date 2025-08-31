@@ -43,12 +43,27 @@ docker-compose ps
 - ✅ **Automatic database setup** with schema migration
 
 ## 🔧 Troubleshooting:
-```bash
-# View logs
-docker-compose logs -f
 
-# Restart services
-docker-compose restart
+### Web UI Not Accessible on Port 5000?
+```bash
+# Check if containers are running
+docker-compose ps
+
+# View application logs for errors
+docker-compose logs resonance-scanner
+
+# Restart the application container
+docker-compose restart resonance-scanner
+
+# If still not working, rebuild and restart
+docker-compose down
+docker-compose up -d
+```
+
+### Other Issues:
+```bash
+# View all logs
+docker-compose logs -f
 
 # Stop and remove (keeps data)
 docker-compose down
