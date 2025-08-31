@@ -1,6 +1,4 @@
 # Resonance.ai Breakout Scanner - Docker Compose
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
@@ -24,11 +22,20 @@ services:
 
   # Resonance Scanner Application
   resonance-scanner:
-    build: .
+    image: node:18-alpine
     container_name: resonance-scanner
+    working_dir: /app
     restart: unless-stopped
     ports:
       - "5000:5000"
+    volumes:
+      # Mount the entire application directory
+      - .:/app
+      # Use named volume for node_modules to avoid permission issues
+      - node_modules_cache:/app/node_modules
+      # Persistent data and logs
+      - scanner_data:/app/data
+      - scanner_logs:/app/logs
     environment:
       NODE_ENV: production
       PORT: 5000
@@ -53,11 +60,25 @@ services:
       DEFAULT_SCAN_MODE: ${DEFAULT_SCAN_MODE:-fast}
       MAX_CONCURRENT_SCANS: ${MAX_CONCURRENT_SCANS:-10}
       
-    volumes:
-      # Persistent data and logs
-      - scanner_data:/app/data
-      - scanner_logs:/app/logs
-      
+    command: |
+      sh -c "
+        echo '🚀 Installing dependencies...' &&
+        apk add --no-cache postgresql-client curl &&
+        npm install &&
+        echo '🔧 Building application...' &&
+        npm run build &&
+        echo '⏳ Waiting for database...' &&
+        while ! pg_isready -h postgres -p 5432 -U scanner_user; do
+          echo 'Database not ready, waiting...'
+          sleep 2
+        done &&
+        echo '🗄️ Setting up database schema...' &&
+        # Build DATABASE_URL from components
+        export DATABASE_URL=\"postgresql://scanner_user:$$DB_PASSWORD@postgres:5432/resonance_scanner\" &&
+        npm run db:push --force &&
+        echo '🎯 Starting Resonance Scanner...' &&
+        npm start
+      "
     depends_on:
       postgres:
         condition: service_healthy
@@ -67,7 +88,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 90s
 
 volumes:
   postgres_data:
@@ -75,6 +96,8 @@ volumes:
   scanner_data:
     driver: local
   scanner_logs:
+    driver: local
+  node_modules_cache:
     driver: local
 
 networks:
