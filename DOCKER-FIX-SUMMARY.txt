@@ -1,7 +1,7 @@
 RESONANCE.AI BREAKOUT SCANNER - DOCKER FIX SUMMARY
 ===================================================
 
-FINAL WORKING PACKAGE: resonance-scanner-unraid-node18-fix-v12.5.tar.gz (1.9MB)
+FINAL WORKING PACKAGE: resonance-scanner-unraid-complete-fix-v12.5.tar.gz (2.0MB)
 
 ISSUES IDENTIFIED AND FIXED:
 ============================
@@ -12,24 +12,29 @@ ISSUES IDENTIFIED AND FIXED:
 2. ❌ SECOND ISSUE: Production build path.resolve() error  
    ✅ FIXED: Switched to development mode to avoid bundling issues
 
-3. ❌ FINAL ISSUE: "import.meta.dirname" undefined in Node.js 18
+3. ❌ THIRD ISSUE: "import.meta.dirname" undefined in vite.config.ts  
    ✅ FIXED: Added docker-startup-fix.sh that patches vite.config.ts automatically
+
+4. ❌ FINAL ISSUE: "import.meta.dirname" undefined in server/vite.ts (Web UI error)
+   ✅ FIXED: Updated startup script to patch BOTH vite.config.ts AND server/vite.ts
 
 ROOT CAUSE:
 ===========
 - Docker node:18-alpine doesn't support import.meta.dirname in tsx
-- vite.config.ts uses import.meta.dirname for path resolution
-- Caused container restart loop on startup
+- TWO files used import.meta.dirname: vite.config.ts AND server/vite.ts
+- vite.config.ts caused container restart loop
+- server/vite.ts caused Web UI TypeError on page load
 
 SOLUTION:
 =========
 - Startup script automatically replaces import.meta.dirname with process.cwd()
-- This provides Docker-compatible path resolution
+- Patches BOTH vite.config.ts AND server/vite.ts for complete compatibility
+- Provides Docker-compatible path resolution in all files
 - No manual file editing required
 
 INSTALLATION:
 =============
-1. tar -xzf resonance-scanner-unraid-node18-fix-v12.5.tar.gz -C /mnt/user/appdata/
+1. tar -xzf resonance-scanner-unraid-complete-fix-v12.5.tar.gz -C /mnt/user/appdata/
 2. cd /mnt/user/appdata/resonance-breakout-scanner/
 3. nano .env (set your password: spider1234@U)
 4. docker-compose up -d

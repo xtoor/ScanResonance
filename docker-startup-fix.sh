@@ -15,5 +15,17 @@ else
     echo "❌ vite.config.ts not found"
 fi
 
+# Fix server/vite.ts for Node.js 18 compatibility
+if [ -f server/vite.ts ]; then
+    echo "Patching server/vite.ts for Node.js 18..."
+    
+    # Replace import.meta.dirname with process.cwd() for Docker compatibility
+    sed -i 's/import\.meta\.dirname/process.cwd()/g' server/vite.ts
+    
+    echo "✅ server/vite.ts patched successfully"
+else
+    echo "❌ server/vite.ts not found"
+fi
+
 echo "🎯 Starting application..."
 exec "$@"
