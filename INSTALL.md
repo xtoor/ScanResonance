@@ -3,7 +3,7 @@
 ## 📦 Step 1: Extract Files
 ```bash
 # Extract to unraid appdata directory  
-tar -xzf resonance-scanner-unraid-complete-fix-v12.5.tar.gz -C /mnt/user/appdata/
+tar -xzf resonance-scanner-unraid-permissions-fix-v12.5.tar.gz -C /mnt/user/appdata/
 cd /mnt/user/appdata/resonance-breakout-scanner/
 ```
 
@@ -37,12 +37,12 @@ docker-compose ps
 - **Configuration Panel**: Adjust scan settings
 
 ## ✅ Fixed Issues:
+- ✅ **Script permissions fix** - Automatically sets execute permissions on startup script  
 - ✅ **Node.js 18 complete compatibility** - Patches BOTH vite.config.ts AND server/vite.ts  
 - ✅ **import.meta.dirname fix** - Replaces with process.cwd() in all files
 - ✅ **Web UI path resolution** - Frontend and backend serve correctly
 - ✅ **DevDependencies install fix** - Build tools (vite, drizzle-kit) now properly installed
 - ✅ **Special characters in passwords** now supported (`@`, `#`, `%`, etc.)  
-- ✅ **Removed obsolete version field** from docker-compose.yml
 - ✅ **Container restart loop** - No more infinite restart cycles
 
 ## 🔧 Troubleshooting:

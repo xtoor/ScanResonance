@@ -1,0 +1,42 @@
+resonance-scanner  | 🚀 Installing dependencies...
+resonance-scanner  | fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/main/x86_64/APKINDEX.tar.gz
+resonance-scanner  | fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/community/x86_64/APKINDEX.tar.gz
+resonance-scanner  | OK: 19 MiB in 33 packages
+resonance-scanner  | 
+resonance-scanner  | up to date, audited 482 packages in 2s
+resonance-scanner  | 
+resonance-scanner  | 64 packages are looking for funding
+resonance-scanner  |   run `npm fund` for details
+resonance-scanner  | 
+resonance-scanner  | 11 vulnerabilities (3 low, 8 moderate)
+resonance-scanner  | 
+resonance-scanner  | To address issues that do not require attention, run:
+resonance-scanner  |   npm audit fix
+resonance-scanner  | 
+resonance-scanner  | To address all issues (including breaking changes), run:
+resonance-scanner  |   npm audit fix --force
+resonance-scanner  | 
+resonance-scanner  | Run `npm audit` for details.
+resonance-scanner  | 🔧 Fixing Node.js 18 compatibility...
+resonance-scanner  | sh: ./docker-startup-fix.sh: Permission denied
+resonance-scanner  | 🚀 Installing dependencies...
+resonance-scanner  | fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/main/x86_64/APKINDEX.tar.gz
+resonance-scanner  | fetch https://dl-cdn.alpinelinux.org/alpine/v3.21/community/x86_64/APKINDEX.tar.gz
+resonance-scanner  | OK: 19 MiB in 33 packages
+resonance-scanner  | 
+resonance-scanner  | up to date, audited 482 packages in 2s
+resonance-scanner  | 
+resonance-scanner  | 64 packages are looking for funding
+resonance-scanner  |   run `npm fund` for details
+resonance-scanner  | 
+resonance-scanner  | 11 vulnerabilities (3 low, 8 moderate)
+resonance-scanner  | 
+resonance-scanner  | To address issues that do not require attention, run:
+resonance-scanner  |   npm audit fix
+resonance-scanner  | 
+resonance-scanner  | To address all issues (including breaking changes), run:
+resonance-scanner  |   npm audit fix --force
+resonance-scanner  | 
+resonance-scanner  | Run `npm audit` for details.
+resonance-scanner  | 🔧 Fixing Node.js 18 compatibility...
+resonance-scanner  | sh: ./docker-startup-fix.sh: Permission denied

@@ -1,7 +1,7 @@
 RESONANCE.AI BREAKOUT SCANNER - DOCKER FIX SUMMARY
 ===================================================
 
-FINAL WORKING PACKAGE: resonance-scanner-unraid-complete-fix-v12.5.tar.gz (2.0MB)
+FINAL WORKING PACKAGE: resonance-scanner-unraid-permissions-fix-v12.5.tar.gz (2.0MB)
 
 ISSUES IDENTIFIED AND FIXED:
 ============================
@@ -15,8 +15,11 @@ ISSUES IDENTIFIED AND FIXED:
 3. ❌ THIRD ISSUE: "import.meta.dirname" undefined in vite.config.ts  
    ✅ FIXED: Added docker-startup-fix.sh that patches vite.config.ts automatically
 
-4. ❌ FINAL ISSUE: "import.meta.dirname" undefined in server/vite.ts (Web UI error)
+4. ❌ FOURTH ISSUE: "import.meta.dirname" undefined in server/vite.ts (Web UI error)
    ✅ FIXED: Updated startup script to patch BOTH vite.config.ts AND server/vite.ts
+
+5. ❌ FINAL ISSUE: "Permission denied" on docker-startup-fix.sh (restart loop)
+   ✅ FIXED: Added chmod +x to set execute permissions before running script
 
 ROOT CAUSE:
 ===========
@@ -24,9 +27,11 @@ ROOT CAUSE:
 - TWO files used import.meta.dirname: vite.config.ts AND server/vite.ts
 - vite.config.ts caused container restart loop
 - server/vite.ts caused Web UI TypeError on page load
+- Extracted tar.gz files don't preserve execute permissions in Docker
 
 SOLUTION:
 =========
+- Added chmod +x to set execute permissions on startup script
 - Startup script automatically replaces import.meta.dirname with process.cwd()
 - Patches BOTH vite.config.ts AND server/vite.ts for complete compatibility
 - Provides Docker-compatible path resolution in all files
@@ -34,7 +39,7 @@ SOLUTION:
 
 INSTALLATION:
 =============
-1. tar -xzf resonance-scanner-unraid-complete-fix-v12.5.tar.gz -C /mnt/user/appdata/
+1. tar -xzf resonance-scanner-unraid-permissions-fix-v12.5.tar.gz -C /mnt/user/appdata/
 2. cd /mnt/user/appdata/resonance-breakout-scanner/
 3. nano .env (set your password: spider1234@U)
 4. docker-compose up -d

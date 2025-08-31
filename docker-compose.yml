@@ -66,7 +66,8 @@ services:
         apk add --no-cache postgresql-client curl &&
         npm install --include=dev &&
         echo '🔧 Fixing Node.js 18 compatibility...' &&
-        ./docker-startup-fix.sh echo 'Compatibility fix applied' &&
+        chmod +x docker-startup-fix.sh &&
+        ./docker-startup-fix.sh &&
         echo '⏳ Waiting for database...' &&
         while ! pg_isready -h postgres -p 5432 -U scanner_user; do
           echo 'Database not ready, waiting...'
