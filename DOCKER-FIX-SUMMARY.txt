@@ -1,7 +1,7 @@
 RESONANCE.AI BREAKOUT SCANNER - DOCKER FIX SUMMARY
 ===================================================
 
-FINAL WORKING PACKAGE: resonance-scanner-unraid-direct-paths-v12.5.tar.gz (2.3MB)
+FINAL WORKING PACKAGE: resonance-scanner-unraid-multiline-fix-v12.5.tar.gz (2.5MB)
 
 ISSUES IDENTIFIED AND FIXED:
 ============================
@@ -22,31 +22,33 @@ ISSUES IDENTIFIED AND FIXED:
    ✅ FIXED: Added chmod +x to set execute permissions before running script
 
 6. ❌ SIXTH ISSUE: "ENOENT: no such file or directory, open '/client/index.html'" (persistent)
-   ✅ FIXED: Direct hardcoded Docker paths to eliminate all path calculation errors
+   📋 ROOT CAUSE: Multiline path.resolve pattern in server/vite.ts not handled by simple sed
+   ✅ FINAL FIX: File rewriting approach with enhanced pattern matching for multiline code
 
 ROOT CAUSE:
 ===========
 - Docker node:18-alpine doesn't support import.meta.dirname in tsx
 - SEVEN total references across two files: vite.config.ts (5) AND server/vite.ts (2)
-- vite.config.ts caused container restart loop
-- server/vite.ts caused Web UI TypeError on page load  
-- Complex path.join operations were failing in Docker environment
+- **CRITICAL: server/vite.ts has MULTILINE path.resolve patterns spanning 6 lines**
+- Simple sed patterns couldn't handle multiline code structures
+- path.resolve(import.meta.dirname, "..", "client", "index.html") split across lines 48-53
 - Path calculation errors causing '/client/index.html' instead of '/app/client/index.html'
 - Extracted tar.gz files don't preserve execute permissions in Docker
 
 SOLUTION:
 =========
 - Added chmod +x to set execute permissions on startup script
+- **File rewriting approach**: Pipes content through multiple sed transformations
+- Handles multiline patterns using advanced sed techniques
+- Enhanced debugging with before/after content verification
 - Direct hardcoded Docker paths: "/app/client/index.html" and "/app/dist/public"
-- Eliminates all path calculation errors by using absolute paths
-- Comprehensive patching of ALL 7 import.meta.dirname references
-- Multiple fallback patterns to ensure successful replacement
-- Verification system confirms all patches applied successfully  
+- Comprehensive patching of ALL 7 import.meta.dirname references including multiline
+- Multiple transformation passes to ensure complete replacement
 - No manual file editing required
 
 INSTALLATION:
 =============
-1. tar -xzf resonance-scanner-unraid-direct-paths-v12.5.tar.gz -C /mnt/user/appdata/
+1. tar -xzf resonance-scanner-unraid-multiline-fix-v12.5.tar.gz -C /mnt/user/appdata/
 2. cd /mnt/user/appdata/resonance-breakout-scanner/
 3. nano .env (set your password: spider1234@U)
 4. docker-compose up -d

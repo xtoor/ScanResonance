@@ -3,7 +3,7 @@
 ## 📦 Step 1: Extract Files
 ```bash
 # Extract to unraid appdata directory  
-tar -xzf resonance-scanner-unraid-direct-paths-v12.5.tar.gz -C /mnt/user/appdata/
+tar -xzf resonance-scanner-unraid-multiline-fix-v12.5.tar.gz -C /mnt/user/appdata/
 cd /mnt/user/appdata/resonance-breakout-scanner/
 ```
 
@@ -37,9 +37,9 @@ docker-compose ps
 - **Configuration Panel**: Adjust scan settings
 
 ## ✅ Fixed Issues:
-- ✅ **Direct path resolution** - Uses hardcoded Docker paths to eliminate path calculation errors
-- ✅ **Comprehensive fix** - Patches ALL import.meta.dirname references across all files  
-- ✅ **Verification system** - Confirms all patches applied successfully on startup
+- ✅ **Multiline pattern fix** - Handles complex multiline path.resolve statements correctly
+- ✅ **File rewriting approach** - Completely rewrites problematic files with direct paths  
+- ✅ **Enhanced debugging** - Shows before/after content for verification
 - ✅ **Script permissions fix** - Automatically sets execute permissions on startup script  
 - ✅ **Web UI accessibility** - Frontend template files found at correct Docker paths
 - ✅ **DevDependencies install fix** - Build tools (vite, drizzle-kit) now properly installed
