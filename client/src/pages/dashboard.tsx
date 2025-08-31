@@ -133,6 +133,7 @@ export default function Dashboard() {
           onStartScanning={handleStartScanning}
           onStopScanning={handleStopScanning}
           configuration={configuration}
+          currentPair={scanStats.currentPair}
         />
       </div>
 

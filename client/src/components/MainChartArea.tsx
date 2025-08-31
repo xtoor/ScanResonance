@@ -17,6 +17,7 @@ interface MainChartAreaProps {
   onStartScanning: () => void;
   onStopScanning: () => void;
   configuration: Partial<BreakoutConfiguration>;
+  currentPair?: string;
 }
 
 export default function MainChartArea({
@@ -27,9 +28,12 @@ export default function MainChartArea({
   isScanning,
   onStartScanning,
   onStopScanning,
-  configuration
+  configuration,
+  currentPair
 }: MainChartAreaProps) {
-  const { priceData, loading } = usePriceData(selectedSymbol);
+  // Use currentPair when scanning, fallback to selectedSymbol when not scanning
+  const displaySymbol = isScanning && currentPair ? currentPair : selectedSymbol;
+  const { priceData, loading } = usePriceData(displaySymbol);
   return (
     <main className="flex-1 flex flex-col">
       {/* Chart Header with Controls */}
@@ -64,6 +68,9 @@ export default function MainChartArea({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="bg-trading-card border-trading-border p-3">
             <div className="text-xs text-trading-muted mb-1">Current Price</div>
+            <div className="text-xs text-trading-muted mb-1 font-mono">
+              {isScanning && currentPair ? currentPair : selectedSymbol}
+            </div>
             <div className="text-lg font-mono font-bold" data-testid="text-current-price">
               {loading ? '...' : priceData ? `$${priceData.price.toFixed(8)}` : '$0.00000000'}
             </div>
