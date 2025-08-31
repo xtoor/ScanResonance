@@ -3,7 +3,7 @@
 ## 📦 Step 1: Extract Files
 ```bash
 # Extract to unraid appdata directory  
-tar -xzf resonance-scanner-unraid-python-fix-v12.5.tar.gz -C /mnt/user/appdata/
+tar -xzf resonance-scanner-unraid-advanced-sed-v12.5.tar.gz -C /mnt/user/appdata/
 cd /mnt/user/appdata/resonance-breakout-scanner/
 ```
 
@@ -37,9 +37,9 @@ docker-compose ps
 - **Configuration Panel**: Adjust scan settings
 
 ## ✅ Fixed Issues:
-- ✅ **Python regex replacement** - Uses Python for precise multiline pattern matching  
-- ✅ **Complete path.resolve elimination** - Replaces entire blocks with direct paths
-- ✅ **Enhanced debugging** - Shows exact problematic patterns before/after
+- ✅ **Advanced sed multiline** - Uses awk and multiple sed passes for precise pattern matching  
+- ✅ **Alpine Linux compatible** - No Python3 dependency, works with node:18-alpine
+- ✅ **Line-by-line replacement** - Manually skips multiline blocks and replaces with direct paths
 - ✅ **Script permissions fix** - Automatically sets execute permissions on startup script  
 - ✅ **Web UI accessibility** - Frontend template files found at correct Docker paths
 - ✅ **DevDependencies install fix** - Build tools (vite, drizzle-kit) now properly installed

@@ -1,7 +1,7 @@
 RESONANCE.AI BREAKOUT SCANNER - DOCKER FIX SUMMARY
 ===================================================
 
-FINAL WORKING PACKAGE: resonance-scanner-unraid-python-fix-v12.5.tar.gz (2.5MB)
+FINAL WORKING PACKAGE: resonance-scanner-unraid-advanced-sed-v12.5.tar.gz (2.6MB)
 
 ISSUES IDENTIFIED AND FIXED:
 ============================
@@ -23,7 +23,8 @@ ISSUES IDENTIFIED AND FIXED:
 
 6. ❌ SIXTH ISSUE: "ENOENT: no such file or directory, open '/client/index.html'" (persistent)
    📋 ROOT CAUSE: process.cwd() + ".." resolves to wrong path in Docker (/client vs /app/client)
-   ✅ FINAL FIX: Python regex replacement eliminates entire path.resolve() calls with direct paths
+   ❌ Python fix failed: "python3: not found" in node:18-alpine
+   ✅ FINAL FIX: Advanced sed + awk approach eliminates multiline path.resolve() blocks
 
 ROOT CAUSE:
 ===========
@@ -38,17 +39,17 @@ ROOT CAUSE:
 SOLUTION:
 =========
 - Added chmod +x to set execute permissions on startup script
-- **Python regex replacement**: Uses Python for precise multiline pattern matching
-- Eliminates entire path.resolve() blocks instead of partial replacement
+- **Advanced sed + awk replacement**: Alpine Linux compatible, no Python dependency
+- Multiple sed passes + awk line-by-line processing for complex multiline patterns
+- awk manually skips 5-line multiline blocks and replaces with single direct path
 - Enhanced debugging shows exact patterns before/after replacement
 - Direct hardcoded Docker paths: "/app/client/index.html" and "/app/dist/public"
-- Regex patterns handle complex multiline code structures with whitespace
-- Multiple regex passes ensure complete elimination of problematic code
+- Multiple transformation methods ensure complete elimination of problematic code
 - No manual file editing required
 
 INSTALLATION:
 =============
-1. tar -xzf resonance-scanner-unraid-python-fix-v12.5.tar.gz -C /mnt/user/appdata/
+1. tar -xzf resonance-scanner-unraid-advanced-sed-v12.5.tar.gz -C /mnt/user/appdata/
 2. cd /mnt/user/appdata/resonance-breakout-scanner/
 3. nano .env (set your password: spider1234@U)
 4. docker-compose up -d
