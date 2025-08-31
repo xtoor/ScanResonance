@@ -31,7 +31,7 @@ export default function MainChartArea({
 }: MainChartAreaProps) {
   const { priceData, loading } = usePriceData(selectedSymbol);
   return (
-    <main className="flex-1 flex flex-col">
+    <main className="flex-1 flex flex-col ml-[199px] mr-[199px]">
       {/* Chart Header with Controls */}
       <div className="bg-trading-dark border-b border-trading-border p-4 ml-[199px] mr-[199px]">
         <div className="flex items-center justify-between mb-4">
