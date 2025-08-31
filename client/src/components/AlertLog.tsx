@@ -25,12 +25,11 @@ export default function AlertLog() {
   }
 
   return (
-    <div className="bg-trading-dark border-t border-trading-border p-4 h-48 overflow-y-auto">
+    <div className="bg-trading-dark border-t border-trading-border p-4 h-48 overflow-y-auto pl-[200px] pr-[200px] ml-[199px] mr-[199px]">
       <h3 className="text-sm font-semibold mb-3 flex items-center">
         <History className="mr-2 text-warning w-4 h-4" />
         Recent Alerts
       </h3>
-      
       <div className="space-y-2" data-testid="alert-list">
         {alerts.length === 0 ? (
           <div className="text-center text-trading-muted py-8">
