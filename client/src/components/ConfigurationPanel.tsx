@@ -167,18 +167,6 @@ export default function ConfigurationPanel({
               />
             </div>
 
-            <div className="mt-4">
-              <Label className="block text-sm font-medium mb-2">Discord Webhook URL (Optional)</Label>
-              <Input
-                type="url"
-                value={(configuration as any).discordWebhook || ""}
-                onChange={(e) => handleInputChange("discordWebhook" as any, e.target.value)}
-                className="w-full bg-trading-darker border-trading-border text-trading-text text-sm mb-4"
-                placeholder="https://discord.com/api/webhooks/..."
-                data-testid="input-discord-webhook"
-              />
-              <div className="text-xs text-trading-muted mb-4">Enable Discord notifications for breakout alerts</div>
-            </div>
 
             <div>
               <Label className="block text-sm font-medium mb-2">Alert Message Template</Label>

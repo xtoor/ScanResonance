@@ -36,17 +36,6 @@ export default function MainChartArea({
       <div className="bg-trading-dark border-b border-trading-border p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-4">
-            <Select value={selectedSymbol} onValueChange={onSymbolChange}>
-              <SelectTrigger className="bg-trading-darker border-trading-border text-trading-text w-40" data-testid="select-symbol">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {POPULAR_PAIRS.map(pair => (
-                  <SelectItem key={pair} value={pair}>{pair}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            
             <div className="flex items-center space-x-2">
               <span className="text-sm text-trading-muted">Timeframe:</span>
               <Select value={timeframe} onValueChange={onTimeframeChange}>
