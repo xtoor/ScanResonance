@@ -98,7 +98,7 @@ export default function ChartContainer({
     return ((priceRange.max - Math.max(candle.open, candle.close)) / priceSpread) * 200;
   };
   return (
-    <div className="flex-1 relative bg-trading-darker ml-[-199px] mr-[-199px]">
+    <div className="flex-1 relative bg-trading-darker ml-[0px] mr-[0px]">
       <div className="absolute inset-0 p-6 ml-[135px] mr-[135px] pl-[0px] pr-[0px] pt-[0px] pb-[0px]">
         <Card className="w-full h-full bg-trading-dark border-trading-border relative overflow-hidden">
           {/* Chart Grid Background */}
@@ -156,7 +156,7 @@ export default function ChartContainer({
                             style={{ backgroundColor: configuration.potentialColor || "#FF9800" }}
                             data-testid="potential-signal"
                           >
-                            $110648.82$109825.04$109001.25$108762.43$107765.58$106529.9110:26 AM10:51 AM11:16 AM11:41 AM12:01 PMConfirmed BreakoutPotential BreakoutVolume
+                            $110648.82$109825.04$109001.25$108762.43$107765.58$106529.9110:26 AM10:51 AM11:16 AM11:41 AM12:01 PMConfirmed BreakoutPotential BreakoutVolume$110648.82$109825.04$109001.25$108762.43$107765.58$106529.9110:26 AM10:51 AM11:16 AM11:41 AM12:01 PMConfirmed BreakoutPotential BreakoutVolume$111093.29$110213.37$109333.45$108787.48$108013.58$106693.7010:27 AM10:52 AM11:17 AM11:42 AM12:02 PMConfirmed BreakoutPotential BreakoutVolume
                           </div>
                           <div 
                             className="absolute top-0 left-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent transform -translate-x-1/2 -translate-y-1"
