@@ -96,7 +96,7 @@ export default function TopCoinsPanel({ onCoinsSelected, className }: TopCoinsPa
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="p-4 space-y-4">
+      <CardContent className="space-y-6">
         {/* Configuration Controls */}
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
