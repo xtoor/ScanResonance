@@ -35,22 +35,7 @@ export default function MainChartArea({
       {/* Chart Header with Controls */}
       <div className="bg-trading-dark border-b border-trading-border p-4 ml-[135px] mr-[135px]">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-trading-muted">Timeframe:</span>
-              <Select value={timeframe} onValueChange={onTimeframeChange}>
-                <SelectTrigger className="bg-trading-darker border-trading-border text-trading-text w-20" data-testid="select-timeframe">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1m">1m</SelectItem>
-                  <SelectItem value="5m">5m</SelectItem>
-                  <SelectItem value="15m">15m</SelectItem>
-                  <SelectItem value="1h">1h</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <div></div>
 
           <div className="flex items-center space-x-4">
             {!isScanning ? (
