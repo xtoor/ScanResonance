@@ -3,7 +3,7 @@
 ## 📦 Step 1: Extract Files
 ```bash
 # Extract to unraid appdata directory  
-tar -xzf resonance-scanner-unraid-working-v12.5.tar.gz -C /mnt/user/appdata/
+tar -xzf resonance-scanner-unraid-final-working-v12.5.tar.gz -C /mnt/user/appdata/
 cd /mnt/user/appdata/resonance-breakout-scanner/
 ```
 
@@ -37,10 +37,11 @@ docker-compose ps
 - **Configuration Panel**: Adjust scan settings
 
 ## ✅ Fixed Issues:
+- ✅ **Production build path issue** - Switched to development mode to avoid bundling issues
 - ✅ **DevDependencies install fix** - Build tools (vite, drizzle-kit) now properly installed
 - ✅ **Special characters in passwords** now supported (`@`, `#`, `%`, etc.)  
 - ✅ **Removed obsolete version field** from docker-compose.yml
-- ✅ **Web UI accessibility** - Frontend builds and serves correctly
+- ✅ **Web UI accessibility** - Frontend serves correctly in development mode
 - ✅ **Container restart loop** - No more infinite restart cycles
 
 ## 🔧 Troubleshooting:
