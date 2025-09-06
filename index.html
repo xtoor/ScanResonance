@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ScanResonance • Resonance.ai Breakout Scanner</title>
+  <meta name="description" content="AI-powered cryptocurrency breakout scanner with real-time monitoring, TradingView integration, and dynamic top coins detection."/>
+  <link rel="preconnect" href="https://img.shields.io" crossorigin>
+  <style>
+    :root{
+      --bg:#0b0f18;           /* deep space */
+      --panel:#101826cc;      /* glass */
+      --text:#c9d2f0;         /* moonlight */
+      --muted:#98a2cB;        /* soft steel */
+      --primary:#7c9cff;      /* ion blue */
+      --accent:#00ffd1;       /* neon mint */
+      --warn:#ffb86b;         /* amber */
+      --shadow:0 10px 30px rgba(0,0,0,.45);
+      --radius:22px;
+    }
+
+    /* ---------- Global & layout ---------- */
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--text); background:var(--bg); overflow-x:hidden;
+    }
+    .container{width:min(1200px, 92vw); margin:0 auto;}
+    a{color:var(--accent); text-decoration:none}
+    section{padding:64px 0}
+
+    /* ---------- Animated background ---------- */
+    .bg-wrap{position:fixed; inset:0; z-index:-2;}
+    .bg-gradients{position:absolute; inset:-40vh -40vw; filter:blur(90px); opacity:.7;}
+    .orb{position:absolute; width:55vw; height:55vw; border-radius:50%; mix-blend:screen;}
+    .orb.one{left:-10vw; top:-10vh; background:radial-gradient(circle at 30% 30%, #1b5cff, transparent 60%)}
+    .orb.two{right:-5vw; top:20vh; background:radial-gradient(circle at 70% 20%, #00ffd1, transparent 60%)}
+    .orb.three{left:20vw; bottom:-10vh; background:radial-gradient(circle at 40% 70%, #8a2be2, transparent 65%)}
+    .stars{position:absolute; inset:0; background:radial-gradient(transparent, rgba(0,0,0,.6)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">%3Cg fill="white" opacity="0.6">%3Ccircle cx="10" cy="20" r=".6"/><circle cx="30" cy="90" r=".8"/><circle cx="60" cy="10" r=".7"/><circle cx="80" cy="40" r=".5"/><circle cx="55" cy="70" r=".6"/><circle cx="15" cy="55" r=".5"/>%3C/g>%3C/svg>'); background-size:cover; animation: twinkle 8s linear infinite; mix-blend:screen; opacity:.5}
+    @keyframes twinkle{0%{opacity:.3} 50%{opacity:.6} 100%{opacity:.3}}
+
+    /* ---------- Navbar ---------- */
+    .nav{position:sticky; top:0; backdrop-filter: blur(16px); background:linear-gradient(180deg, rgba(10,14,22,.8), rgba(10,14,22,.35)); border-bottom:1px solid rgba(255,255,255,.06); z-index:20}
+    .nav-inner{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 0}
+    .brand{display:flex; align-items:center; gap:12px; letter-spacing:.5px}
+    .logo{width:34px; height:34px; border-radius:50%; background:conic-gradient(from 120deg, var(--accent), var(--primary), #8a2be2, var(--accent)); box-shadow:0 0 24px rgba(0,255,209,.35)}
+    .brand h1{font-size:18px; margin:0}
+    .nav-actions a{display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,.08); padding:10px 14px; border-radius:14px; color:var(--text)}
+    .nav-actions a:hover{border-color:rgba(255,255,255,.18)}
+
+    /* ---------- Hero ---------- */
+    .hero{padding:96px 0 56px}
+    .hero-grid{display:grid; grid-template-columns: 1.25fr .95fr; gap:36px; align-items:center}
+    .kicker{display:inline-flex; align-items:center; gap:8px; font-size:12px; text-transform:uppercase; letter-spacing:1.4px; color:var(--muted);}
+    .title{font-size:clamp(36px, 6vw, 64px); line-height:1.05; margin:10px 0 18px;}
+    .title strong{color:var(--accent); text-shadow:0 0 18px rgba(0,255,209,.25)}
+    .subtitle{font-size:18px; color:#c3ccff; opacity:.9;}
+    .cta{margin-top:26px; display:flex; gap:12px; flex-wrap:wrap}
+    .btn{display:inline-flex; align-items:center; gap:12px; padding:14px 18px; border-radius:18px; border:1px solid rgba(255,255,255,.1); background:linear-gradient(180deg, rgba(124,156,255,.16), rgba(0,0,0,.1)); color:white; box-shadow:var(--shadow)}
+    .btn:hover{transform:translateY(-1px)}
+
+    .screen{
+      width:100%; aspect-ratio: 16/9; background:radial-gradient(120% 120% at 20% 10%, rgba(124,156,255,.2), rgba(0,0,0,.5)), linear-gradient(180deg, #0f1629, #0b0f18);
+      border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow);
+      position:relative;
+    }
+    .screen:before{content:""; position:absolute; inset:0; background: linear-gradient(120deg, rgba(124,156,255,.15), transparent 30%, rgba(0,255,209,.12) 60%, transparent 90%); filter:blur(8px);}
+    .screen img{width:100%; height:100%; object-fit:cover; display:block; mix-blend:screen; opacity:.9}
+
+    /* ---------- Badges ---------- */
+    .badges{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:20px}
+    .badges img{height:28px}
+
+    /* ---------- Feature grid ---------- */
+    .grid{display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-top:26px}
+    .card{background:var(--panel); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow)}
+    .card h3{margin:0 0 8px}
+    .meta{font-size:14px; color:var(--muted)}
+
+    /* ---------- Showcase images ---------- */
+    .gallery{display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-top:18px}
+    .shot{position:relative; overflow:hidden; border-radius:18px; border:1px solid rgba(255,255,255,.08); aspect-ratio:16/10; background:#111825}
+    .shot img{width:100%; height:100%; object-fit:cover; opacity:.9}
+
+    /* ---------- Code blocks ---------- */
+    pre{background:#0e1422; border:1px solid rgba(255,255,255,.08); padding:18px; border-radius:14px; overflow:auto}
+    code{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size:13px; color:#d7e3ff}
+
+    /* ---------- Footer ---------- */
+    footer{padding:40px 0 60px; color:var(--muted)}
+    .footer-inner{display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between}
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 960px){
+      .hero-grid{grid-template-columns:1fr}
+      .grid, .gallery{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-wrap" aria-hidden="true">
+    <div class="bg-gradients">
+      <div class="orb one"></div>
+      <div class="orb two"></div>
+      <div class="orb three"></div>
+    </div>
+    <div class="stars"></div>
+  </div>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <h1>ScanResonance</h1>
+        <span class="meta">v12.5</span>
+      </div>
+      <div class="nav-actions">
+        <a href="https://xtoor.github.io/ScanResonance/" target="_blank" rel="noreferrer">Live Demo</a>
+        <a href="https://github.com/xtoor/ScanResonance" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="#install">Install</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="container hero-grid">
+      <div>
+        <span class="kicker">AI • Crypto • Breakout Scanner</span>
+        <h2 class="title">A <strong>futuristic</strong> TradingView‑style scanner for real‑time breakout detection.</h2>
+        <p class="subtitle">Monitors 330+ pairs, dynamic top coins, volume spikes, Pine Script generation, Discord alerts, and a sleek dark UI.</p>
+        <div class="cta">
+          <a class="btn" href="https://github.com/xtoor/ScanResonance" target="_blank" rel="noreferrer">⭐ Star the repo</a>
+          <a class="btn" href="#features">Explore features</a>
+        </div>
+        <div class="badges" aria-label="project badges">
+          <a href="https://github.com/xtoor/ScanResonance" target="_blank" rel="noreferrer"><img alt="GitHub stars" src="https://img.shields.io/github/stars/xtoor/ScanResonance?style=for-the-badge&logo=github"></a>
+          <a href="https://github.com/xtoor/ScanResonance/fork" target="_blank" rel="noreferrer"><img alt="GitHub forks" src="https://img.shields.io/github/forks/xtoor/ScanResonance?style=for-the-badge"></a>
+          <a href="https://github.com/xtoor/ScanResonance/issues" target="_blank" rel="noreferrer"><img alt="Issues" src="https://img.shields.io/github/issues/xtoor/ScanResonance?style=for-the-badge"></a>
+          <a href="https://github.com/xtoor/ScanResonance/commits" target="_blank" rel="noreferrer"><img alt="Last commit" src="https://img.shields.io/github/last-commit/xtoor/ScanResonance?style=for-the-badge"></a>
+          <a href="https://github.com/xtoor/ScanResonance/blob/main/LICENSE" target="_blank" rel="noreferrer"><img alt="License" src="https://img.shields.io/github/license/xtoor/ScanResonance?style=for-the-badge"></a>
+          <a href="https://github.com/xtoor/ScanResonance" target="_blank" rel="noreferrer"><img alt="Repo size" src="https://img.shields.io/github/repo-size/xtoor/ScanResonance?style=for-the-badge"></a>
+        </div>
+      </div>
+      <div class="screen" aria-label="product screenshot">
+        <img src="https://via.placeholder.com/1280x720/121826/00ffd1?text=Resonance.ai+Dashboard" alt="Resonance.ai dashboard screenshot placeholder" />
+      </div>
+    </div>
+  </header>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="container">
+      <div class="grid">
+        <article class="card">
+          <h3>Real‑time Breakout Detection</h3>
+          <p class="meta">Monitors 330+ cryptocurrency pairs with FAST (1.3%), MEDIUM (1.8%) and SLOW (2.4%) modes.</p>
+        </article>
+        <article class="card">
+          <h3>Dynamic Top Coins</h3>
+          <p class="meta">Automatically ranks high‑volatility, high‑liquidity assets and feeds them into the scanner.</p>
+        </article>
+        <article class="card">
+          <h3>Volume Spike Analysis</h3>
+          <p class="meta">Configurable volume ratio thresholds to validate momentum behind each move.</p>
+        </article>
+        <article class="card">
+          <h3>TradingView Integration</h3>
+          <p class="meta">Generate Pine Script indicators directly from the app for instant charting.</p>
+        </article>
+        <article class="card">
+          <h3>Alerting & Discord</h3>
+          <p class="meta">Visual alerts plus optional sound and Discord webhook notifications.</p>
+        </article>
+        <article class="card">
+          <h3>Modern Stack</h3>
+          <p class="meta">React + TypeScript UI, Node/Express backend, PostgreSQL with Drizzle ORM.</p>
+        </article>
+      </div>
+
+      <div class="gallery" aria-label="UI gallery">
+        <div class="shot"><img src="https://via.placeholder.com/1200x800/0f1629/7c9cff?text=Candlesticks+%2B+Breakout+Overlays" alt="Chart example"/></div>
+        <div class="shot"><img src="https://via.placeholder.com/1200x800/0f1629/00ffd1?text=Top+Coins+Ranking" alt="Top coins panel"/></div>
+        <div class="shot"><img src="https://via.placeholder.com/1200x800/0f1629/8a2be2?text=Alerts+%26+Status" alt="Alerts and status"/></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSTALL -->
+  <section id="install">
+    <div class="container">
+      <div class="card" style="padding:28px;">
+        <h2 style="margin:0 0 10px">Install & Run</h2>
+        <p class="meta">Follow the quickstart, or see full instructions in <a href="https://github.com/xtoor/ScanResonance/blob/main/README.md" target="_blank" rel="noreferrer">README.md</a>.</p>
+        <pre><code># Clone
+git clone https://github.com/xtoor/ScanResonance.git
+cd ScanResonance
+
+# Configure
+cp .env.example .env
+# Set DATABASE_URL and optional Discord/SMTP in .env
+
+# Install deps
+npm install
+
+# Initialize DB (Drizzle)
+npm run db:push
+
+# Run (dev)
+npm run dev
+# or production
+npm run build && npm start
+</code></pre>
+      </div>
+
+      <div class="grid" style="margin-top:18px;">
+        <div class="card"><h3>Docker</h3><pre><code>docker build -t resonance-scanner .
+docker compose up -d</code></pre></div>
+        <div class="card"><h3>API Endpoints</h3><pre><code>GET /api/configurations
+GET /api/alerts
+GET /api/top-coins
+GET /api/pine-script</code></pre></div>
+        <div class="card"><h3>Stack Highlights</h3><ul class="meta">
+          <li>React 18 + Tailwind (dark UI)</li>
+          <li>Node.js + Express (TypeScript)</li>
+          <li>PostgreSQL + Drizzle ORM</li>
+          <li>Coinbase Advanced API integration</li>
+        </ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> ScanResonance • MIT License • Fork of <a href="https://github.com/metteyya" target="_blank" rel="noreferrer">metteyya</a></p>
+      <div class="badges">
+        <a href="https://github.com/xtoor/ScanResonance/actions" target="_blank" rel="noreferrer"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/xtoor/ScanResonance/ci.yml?style=for-the-badge&label=build"></a>
+        <a href="https://github.com/xtoor/ScanResonance/pulls" target="_blank" rel="noreferrer"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-success?style=for-the-badge"></a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
